@@ -1,7 +1,11 @@
 {
   "name": "drizzl",
   "version": "1.0.0",
-  "description": "",
+  "description": "an audio-art site powered by weather data",
+  "repository" :
+  { "type" : "git"
+  , "url" : "https://github.com/abraidotti/drizzl"
+  }
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.16.2",
     "tonal": "^1.1.0"
   }
 }

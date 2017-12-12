@@ -1,3 +1,6 @@
+// var tonal = require('tonal');
+// import { Note, Interval, Distance, Scale, Chord } from 'tonal'
+
 // Nice 'n neat audio initializers from http://middleearmedia.com/demos/webaudio/controllingosc.html
 // Initialize the Audio Context
 var context = new AudioContext(); // Create audio container with webkit prefix
@@ -84,11 +87,12 @@ var getBlip = (blipNum) => {
 	blip.style.left = xy[1] + 'px';
   document.body.appendChild(blip);
   startOsc(blipNum+150);
+  // midi('c4')
 
   console.log(`${blip.id} frequency = ${blipNum+150}`);
 };
 
 setInterval(function(){
   getBlip(blipNum);
-  blipNum++;
+  blipNum = blipNum+5;
 }, 2000);
