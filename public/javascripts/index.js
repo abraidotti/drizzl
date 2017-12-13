@@ -1,5 +1,74 @@
+var forecast;
+
+var options = {
+  enableHighAccuracy: true,
+  timeout: 5000,
+  maximumAge: 0
+};
+
+function error(err) {
+  console.warn(`ERROR(${err.code}): ${err.message}`);
+};
+
+function makeZipForm() {
+    var zipForm = document.createElement("FORM");
+    zipForm.setAttribute("id", "zipForm");
+    document.body.appendChild(zipForm);
+
+    var zipInput = document.createElement("INPUT");
+    zipInput.setAttribute("type", "text");
+		zipInput.setAttribute("id", "zipInput");
+    zipInput.setAttribute("value", "zip code");
+    document.getElementById("zipForm").appendChild(zipInput);
+
+		var zipButton = document.createElement("INPUT");
+		zipButton.setAttribute("type", "button");
+		zipButton.setAttribute("id", "zipButton");
+		zipButton.setAttribute("value", "submit");
+		zipButton.setAttribute("onClick", "locateZip()");
+    document.getElementById("zipForm").appendChild(zipButton);
+};
+
+function locateZip(value){
+	var zip = document.getElementById("zipInput").value;
+	console.log(zip);
+}
+
+if ("geolocation" in navigator) {
+  navigator.geolocation.getCurrentPosition(success, error, options);
+} else {
+  console.log('Geolocation unavailable.');
+}
+
+function success(pos) {
+	var crd = pos.coords;
+	console.log('Geolocation found.')
+  console.log('Your current position is:');
+  console.log(`Latitude : ${crd.latitude}`);
+  console.log(`Longitude: ${crd.longitude}`);
+  console.log(`Accuracy is more or less ${crd.accuracy} meters.`);
+
+	var xhr = new XMLHttpRequest();
+	console.log('UNSENT', xhr.status);
+	xhr.open('GET', ` https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/${crd.latitude},${crd.longitude}?exclude=minutely,hourly,daily,alerts,flags`);
+	console.log('OPENED', xhr.status);
+
+	xhr.onload = function() {
+		console.log('LOADING', xhr.status);
+    if (xhr.status === 200) {
+			forecast = JSON.parse(xhr.responseText);
+        console.log(forecast);
+    }
+    else {
+        alert('Request failed.  Returned status of ' + xhr.status);
+    }
+	};
+	xhr.send();
+};
+
 
 // Nice 'n neat audio initializers from http://middleearmedia.com/demos/webaudio/controllingosc.html
+
 // Initialize the Audio Context
 var context = new AudioContext(); // Create audio container with webkit prefix
 
@@ -84,13 +153,12 @@ var getBlip = (blipNum) => {
 	blip.style.top = xy[0] + 'px';
 	blip.style.left = xy[1] + 'px';
   document.body.appendChild(blip);
-  //startOsc(blipNum+150);
-  // midi('c4')
+  startOsc(blipNum+150);
 
   console.log(`${blip.id} frequency = ${blipNum+150}`);
 };
 
-setInterval(function(){
-  getBlip(blipNum);
-  blipNum = blipNum+5;
-}, 2000);
+// setInterval(function(){
+//   getBlip(blipNum);
+//   blipNum = blipNum+5;
+// }, 2000);
