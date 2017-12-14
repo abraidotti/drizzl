@@ -18,27 +18,14 @@ window.onload = function(){
       	const crd = pos.coords;
         const userLat = crd.latitude;
         const userLong = crd.longitude;
-      	console.log('Location found.')
+
+        console.log('Location found.')
         console.log('Your current position is:');
         console.log(`Latitude : ${userLat}`);
         console.log(`Longitude: ${userLong}`);
         console.log(`Accuracy is more or less ${crd.accuracy} meters.`);
 
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', ` https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/${crd.latitude},${crd.longitude}?exclude=minutely,hourly,daily,alerts,flags`);
-        console.log('OPENED', xhr.status);
-
-        xhr.onload = function() {
-          console.log('LOADING', xhr.status);
-          if (xhr.status === 200) {
-            forecast = JSON.parse(xhr.responseText);
-              console.log(forecast);
-          }
-          else {
-              alert('Request failed.  Returned status of ' + xhr.status);
-          }
-        };
-        xhr.send();
+        getForecast(userLat, userLong);
       }
 
     } else {
@@ -72,6 +59,7 @@ window.onload = function(){
         event.preventDefault();
         var submittedLocation = locationInput.value;
 
+        // geocode the user's location
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({'address': submittedLocation}, function(results, status) {
           if (status === 'OK') {
@@ -81,22 +69,8 @@ window.onload = function(){
             const userLong = results[0].geometry.location.lng();
             console.log(`Geolocated coords = ${userLat}, ${userLong}`);
 
-              var xhr = new XMLHttpRequest();
+            getForecast(userLat, userLong);
 
-              xhr.open('GET', ` https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/${userLat},${userLong}?exclude=minutely,hourly,daily,alerts,flags`);
-              console.log('OPENED', xhr.status);
-
-            	xhr.onload = function() {
-            		console.log('LOADING', xhr.status);
-                if (xhr.status === 200) {
-            			forecast = JSON.parse(xhr.responseText);
-                    console.log(forecast);
-                }
-                else {
-                    alert('Request failed.  Returned status of ' + xhr.status);
-                }
-            	};
-          	  xhr.send();
           } else {
             alert('Geocode was not successful for the following reason: ' + status);
           }; // end of if status === ok block
@@ -112,6 +86,24 @@ window.onload = function(){
 
   }; // end of geolocation *if* block
 
+  // get a forecast!
+  function getForecast(latFloat, longFloat) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', ` https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/${latFloat},${longFloat}?exclude=minutely,hourly,daily,alerts,flags`);
+    console.log('OPENED', xhr.status);
+
+    xhr.onload = function() {
+      console.log('LOADING', xhr.status);
+      if (xhr.status === 200) {
+        forecast = JSON.parse(xhr.responseText);
+          console.log(forecast);
+      }
+      else {
+          alert('Request failed.  Returned status of ' + xhr.status);
+      }
+    };
+    xhr.send();
+  }
 
 
 }; // end of window.onload block
