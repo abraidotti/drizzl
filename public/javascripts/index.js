@@ -42,7 +42,11 @@ window.onload = function() {
       }
     } else {
       //build a form to ask for user's location
-      var formContainer = document.getElementById("container");
+      var formContainer = document.createElement("DIV");;
+      formContainer.setAttribute("id", "container");
+      //document.body.appendChild(formContainer);
+      document.body.insertBefore(formContainer, document.body.firstChild)
+
       var formHeader = document.createElement("H2");
       formHeader.textContent = "Get your forecast.";
       formContainer.appendChild(formHeader);
@@ -66,14 +70,14 @@ window.onload = function() {
 
       // grab the forecast when the user submits a location
       locationButton.addEventListener("click", function(event) {
+        var submittedLocation = locationInput.value;
+        formContainer.remove();
         var forecastLoader = document.createElement("DIV");
         forecastLoader.setAttribute("id", "forecast-loader");
         document.body.appendChild(forecastLoader);
 
         // prevent page reload on form submission
         event.preventDefault();
-
-        var submittedLocation = locationInput.value;
 
         // geocode the user's location
         var geocoder = new google.maps.Geocoder();
@@ -90,11 +94,14 @@ window.onload = function() {
             // confirm location in console
             console.log(`Geolocated coords = ${userLat}, ${userLong}`);
 
+
             // grab forecast
             getForecast(userLat, userLong);
 
             // kill the loading animation
             forecastLoader.remove();
+
+
           } else {
             alert(
               "Geocode was not successful for the following reason: " + status
@@ -129,12 +136,12 @@ window.onload = function() {
         let apparentTemperature = Math.round(
           forecast.currently.apparentTemperature
         );
-        console.log(
-          `Current temp: ${apparentTemperature} controls blip frequency.`
-        );
+        // console.log(
+        //   `Current temp: ${apparentTemperature} controls blip frequency.`
+        // );
         setInterval(function() {
           drawBlip(apparentTemperature);
-          blipNum++;
+          // blipNum++;
         }, 2000);
       } else {
         // kill the loading animation
@@ -150,10 +157,8 @@ window.onload = function() {
 
 // Initialize the Audio Context
 var context = new AudioContext(); // Create audio container with webkit prefix
-
 // Declare variables in the global scope so they can be disconnected
 var oscillator, gain;
-
 // Create function that routes an OscillatorNode through a GainNode and then to the output
 function startOsc(frequency) {
   // Frequency is passed to this function from input button
@@ -166,7 +171,7 @@ function startOsc(frequency) {
 
   // Create GainNode
   gain = context.createGain(); // Create gain node
-  gain.gain.value = 1; // Set gain to full volume
+  gain.gain.value = 0.5; // Set gain to half
   gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 1);
 
   // Connect the Nodes
@@ -328,42 +333,22 @@ for (var prop in noteValues) {
   }
 }
 
-var blipNum = 0;
-
-// get a random position for the blips
-function getRandomPosition(element) {
-  const w = window;
-  const x = w.innerHeight;
-  const y = w.innerWidth;
-  const randomX = Math.floor(Math.random() * x);
-  const randomY = Math.floor(Math.random() * y);
-  return [randomX, randomY];
-}
-
 // draw blips on the screen and make a sound
 var drawBlip = num => {
-  const blip = document.createElement("div");
-  blip.setAttribute("id", "blip-" + blipNum);
-  document.createElement("div");
-  blip.setAttribute(
-    "style",
-    "border:2px solid black; border-radius: 25px; background-color:steelblue; height:50px; width:50px; position: absolute;"
-  );
-  // draw the blip in a random spot in the window
-  let xy = getRandomPosition(blip);
-  blip.style.top = xy[0] + "px";
-  blip.style.left = xy[1] + "px";
-  document.body.appendChild(blip);
-  // make a sound
-  console.log(num + 400);
-  var blipFrequency = num + 400;
-  startOsc(blipFrequency);
-  console.log(`${blip.id} frequency = ${blipFrequency}`);
-
-  // remove old blips one by one after 10 appear on the screen
-  if (blipNum > 9) {
-    var oldBlip = document.getElementById("blip-" + (blipNum - 10));
-    console.log(`Goodbye ${oldBlip.id}!`);
-    oldBlip.remove();
+  for (let i = 0; i < num; i++){
+    let x = Math.random() * window.innerWidth;
+    let y = Math.random() * window.innerHeight;
+    var c = canvas.getContext('2d');
+    c.beginPath();
+    c.arc(x, y, 30, Math.PI * 2, false);
+    c.strokeStyle = 'lightsalmon';
+    c.stroke();
+    var blipFrequency = num + 400;
+    startOsc(blipFrequency);
   }
 };
+
+// initialize the canvas
+const canvas = document.querySelector('canvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
