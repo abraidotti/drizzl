@@ -4,11 +4,20 @@
   <meta charset="utf-8">
   <title>Drizzl</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>
-  <canvas></canvas>
+  <div id="container">
+    <form id="location-form" action="post">
+       <h2>Get your forecast.</h2>
+       <input id="locate-with-browser" type="button" value="get my location">
+       <br>
+       <br>
+       <input id="location-input" type="text" name="location" placeholder="or submit a location">
+       <input id="location-button" type="button" value="submit">
+    </form>
+  </div>
 </body>
-<script src="js/index.js"></script>
+<script src="public/js/forecast.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCT0iGwpbD1QK6xf4gi8rsMP4D1LsYcoHs"></script>
 </html>
