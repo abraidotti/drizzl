@@ -37,3 +37,9 @@ canvas {
   height: 300px;
   margin: 0 auto;
 }
+
+.ball {
+  position: absolute;
+  border-radius: 100%;
+  opacity: 0.7;
+}

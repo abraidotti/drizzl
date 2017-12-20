@@ -2,16 +2,14 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var https = require("https");
 var request = require('request');
-
-//Set up mongoose connection
-var mongoose = require('mongoose');
-var mongoDB = 'mongodb://drizzl:drizzltest@ds161146.mlab.com:61146/forecasts';
-mongoose.connect(mongoDB, {
-  useMongoClient: true
-});
-mongoose.Promise = global.Promise;
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// var mongoose = require('mongoose');
+// var Schema = mongoose.Schema;
+//
+// mongoose.connect('mongodb://drizzl:drizzltest@ds161146.mlab.com:61146/forecasts');
+// mongoose.Promise = global.Promise;
+// var db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// var Forecast = mongoose.model('Forecast', myForecast);
 
 var app = express();
 
@@ -35,7 +33,10 @@ app.post('/', function(req, res){
   console.log('body:', JSON.parse(body));
   res.render('forecast', { body });
   });
+
 });
+
+
 
 const PORT = process.env.PORT || 3000;
 
