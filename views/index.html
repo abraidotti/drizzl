@@ -7,17 +7,19 @@
   <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>
-  <div id="container">
-    <form id="location-form" method="post" action="/">
-       <h2>Let's get a lat/lng first.</h2>
-       <input id="locate-with-browser" type="button" value="Ok get it for me pls.">
-       <br>
-       <h2>or</h2>
-       <br>
-       <input id="location-input" type="text" name="location" placeholder="Use this.">
-       <input id="location-button" type="button" value="submit">
-    </form>
-  </div>
+      <canvas id="index-canvas"></canvas>
+        <div id="location-form-container">
+          <form id="location-form" method="post" action="/">
+             <h2>Let's get a lat/lng first.</h2>
+             <input id="locate-with-browser" type="button" value="Ok get it for me pls.">
+             <br>
+             <h2>or</h2>
+             <br>
+             <input id="location-input" type="text" name="location" placeholder="Use this.">
+             <input id="location-button" type="button" value="submit">
+          </form>
+        </div>
+      </div>
 </body>
 <script src="public/js/locate.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCT0iGwpbD1QK6xf4gi8rsMP4D1LsYcoHs"></script>

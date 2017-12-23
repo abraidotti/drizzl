@@ -1,7 +1,10 @@
 var express = require('express');
+var sassMiddleware = require('node-sass-middleware');
 var bodyParser = require('body-parser');
 var https = require("https");
 var request = require('request');
+var path = require('path');
+
 // var mongoose = require('mongoose');
 // var Schema = mongoose.Schema;
 //
@@ -13,11 +16,20 @@ var request = require('request');
 
 var app = express();
 
-app.use(bodyParser.urlencoded({extended : true}));
-app.set('view engine', 'ejs');
+// adding the sass middleware
+app.use(
+  sassMiddleware({
+    src: __dirname + '/public/sass',
+    dest: __dirname + '/public/css',
+    debug: true,
+  })
+);
 
+app.use(bodyParser.urlencoded({extended : true}));
 app.use('*/css',express.static('public/css'));
 app.use('*/js',express.static('public/js'));
+app.use('*/audio',express.static('public/audio'));
+app.set('view engine', 'ejs');
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/views/index.html');
@@ -33,10 +45,11 @@ app.post('/', function(req, res){
   console.log('body:', JSON.parse(body));
   res.render('forecast', { body });
   });
-
 });
 
-
+app.get('/bye', function(req, res){
+  res.render('bye');
+})
 
 const PORT = process.env.PORT || 3000;
 

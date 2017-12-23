@@ -66,14 +66,14 @@ locationButton.addEventListener("click", function(event) {
 }); // end of click function
 
 function showLoader(){
-  document.querySelector("#container").remove();
+  document.querySelector("#location-form").remove();
+  var locationFormContainer = document.querySelector("#location-form-container");
   forecastLoader = document.createElement("CANVAS");
   forecastLoader.setAttribute("id", "spinner");
-  forecastLoader.setAttribute("height", "window.innerHeight");
-  forecastLoader.setAttribute("width", "window.innerWidth");
-  document.body.appendChild(forecastLoader);
+  forecastLoader.setAttribute("height", "locationFormContainer.height");
+  forecastLoader.setAttribute("width", "locationFormContainer.width");
+  locationFormContainer.appendChild(forecastLoader);
 
-  var canvas = document.getElementById('spinner');
   var context = canvas.getContext('2d');
   var start = new Date();
   var lines = 16,
@@ -87,14 +87,13 @@ function showLoader(){
     context.translate(cW / 2, cH / 2);
     context.rotate(Math.PI * 2 * rotation);
     for (var i = 0; i < lines; i++) {
-
-        context.beginPath();
-        context.rotate(Math.PI * 2 / lines);
-        context.moveTo(cW / 10, 0);
-        context.lineTo(cW / 4, 0);
-        context.lineWidth = cW / 30;
-        context.strokeStyle = "rgba(0, 0, 0," + i / lines + ")";
-        context.stroke();
+      context.beginPath();
+      context.rotate(Math.PI * 2 / lines);
+      context.moveTo(cW / 10, 0);
+      context.lineTo(cW / 4, 0);
+      context.lineWidth = cW / 30;
+      context.strokeStyle = "rgba(0, 0, 0," + i / lines + ")";
+      context.stroke();
     }
     context.restore();
 };
@@ -148,3 +147,112 @@ function readyLatLng(lat, lng){
   readyFormButton.setAttribute('value',"Submit");
   readyForm.appendChild(readyFormButton);
 }
+
+// initialize the canvas
+const canvas = document.querySelector("canvas");
+canvas.width = window.innerWidth * 2/3;
+canvas.height = window.innerHeight * 4/5;
+var ctx = canvas.getContext("2d");
+
+// // add some responsiveness to the page
+// window.addEventListener('resize', function() {
+// 	w = canvas.width = window.innerWidth;
+// 	h = canvas.height = window.innerHeight;
+// });
+
+// play a piano sound
+var soundFileNumber = Math.floor(Math.random() * 13) + 1;
+var ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
+ding.volume = 0.2;
+ding.play();
+
+// setTimeout(function() {
+//   //Do something after 5 seconds
+// }, 5000);
+
+// setInterval(function() {
+//   // Do something every 5 seconds
+// }, 5000);
+
+//first draw the particle vortex
+
+// set particle variables
+var w = canvas.width;
+var h = canvas.height;
+// z axis = square root of h^2 + w^2
+var z = Math.sqrt(h * h + w * w);
+
+var particles = [];
+var particleCount = 10;
+var size = 8;
+
+var particle = function(){
+	this.x = Math.random()*w;
+	this.y = Math.random()*3*h-h;
+	this.d = Math.random()*(size-2)*1 + 2;
+  // this.d = Math.random()*forecast.currently.windspeed*10;
+
+	//draw a particle
+	this.draw = function() {
+    // particle interior outline color
+    ctx.fillStyle = 'rgba(255,255,255,0.1';
+		ctx.beginPath();
+		ctx.arc(this.x, this.y, this.d, 0, 2*Math.PI);
+		ctx.fill();
+    ctx.lineTo(window.innerWidth/2.5, window.innerHeight/2.5);
+    ctx.lineWidth = 2;
+
+    // set line and circle color
+    //ctx.strokeStyle = "hsl(" + (Math.random() * 360) + ",80%,50%)";
+    ctx.strokeStyle = 'rgba(255,255,255,0.1';
+    ctx.stroke();
+
+	}
+	// update the particle
+	this.update = function() {
+		if(this.d < size) {
+			this.x += (1/2)*(this.d-size)*(this.d-size);
+		}else{
+			this.x -= (1/2)*(this.d-size)*(this.d-size);
+		}
+		if(this.x < -50 || this.x > w+50) {
+			this.d = size*2 - this.d;
+		}
+	}
+}
+
+function draw() {
+  //background color
+	ctx.fillStyle = "black";
+
+	ctx.fillRect(-w,-h,3*w,3*h);
+	ctx.translate(w/2,h/2);
+	ctx.rotate(0.001);
+	ctx.translate(-w/2,-h/2);
+
+  // now draw a bunch of particles
+	for(var i=0; i<particles.length; i++) {
+		particles[i].draw();
+		particles[i].update();
+	}
+	window.requestAnimationFrame(draw);
+}
+// add the particle to the array of particles
+for(var i=0; i < particleCount; i++) {
+	particles.push(new particle());
+}
+draw();
+
+
+
+
+// setTimeout(function() {
+//   ctx.clearRect(0, 0, canvas.width, canvas.height);
+//   canvas.remove();
+//   console.log('Thanks for watching.');
+//
+//   var xhr = new XMLHttpRequest();
+//   xhr.open('GET', "views/bye.ejs", true);
+//   xhr.send();
+//
+// }, 30000);
