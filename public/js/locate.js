@@ -190,7 +190,6 @@ var particle = function(){
 	this.x = Math.random()*w;
 	this.y = Math.random()*3*h-h;
 	this.d = Math.random()*(size-2)*1 + 2;
-  // this.d = Math.random()*forecast.currently.windspeed*10;
 
 	//draw a particle
 	this.draw = function() {
@@ -242,17 +241,3 @@ for(var i=0; i < particleCount; i++) {
 	particles.push(new particle());
 }
 draw();
-
-
-
-
-// setTimeout(function() {
-//   ctx.clearRect(0, 0, canvas.width, canvas.height);
-//   canvas.remove();
-//   console.log('Thanks for watching.');
-//
-//   var xhr = new XMLHttpRequest();
-//   xhr.open('GET', "views/bye.ejs", true);
-//   xhr.send();
-//
-// }, 30000);
