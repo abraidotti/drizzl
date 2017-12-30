@@ -4,7 +4,6 @@ document.querySelector("H3").remove();
 console.log(forecast);
 const canvas = document.querySelector('#forecast-canvas');
 
-
 // Based on Viktor Silfverstrom's Canvas Circle: https://codepen.io/bror/pen/yNxGee
 //Settings
 var elementsCount = 5000;
@@ -39,7 +38,7 @@ function draw() {
     var x = (width - sizeX / 2) / 2 + Math.cos(time % 360 * i) * radius * i;
     var y = (height - sizeY / 2) / 2 + Math.sin(time % 360 * i) * radius * i;
 
-    ctx.fillRect(x, y, sizeX, sizeY);
+    ctx.fillRect(x, y + 5, sizeX, sizeY);
   }
 
   time += increment;
@@ -65,12 +64,13 @@ Object.keys(forecast.currently).forEach(function(key) {
   let btn = document.createElement("BUTTON");
   btn.setAttribute("id", `btn-${key}`);
   btn.setAttribute("value", `${key}`);
+  // make the labels readable
   let btnReadableLabel = key
     .split(/(?=[A-Z])/)
     .join(" ")
     .toLowerCase();
   btn.innerHTML = btnReadableLabel;
-  // let's not include non-numerical values and the ambiguous time.
+  // let's exclude non-numerical values and the time.
   if (key != "time" && key != "icon" && key != "summary")
     controlPanel.appendChild(btn);
 

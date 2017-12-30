@@ -7,14 +7,18 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <canvas id="forecast-canvas"></canvas>
-  <div id="control-panel"></div>
-  <div class="ticker-wrap">
-    <div class="ticker">
-      <div class="ticker__item"> forecast </div>
-    </div>
-  </div>
   <h3><%= body %></h3>
+  <div id="wrapper">
+
+    <canvas id="forecast-canvas"></canvas>
+    <div id="control-panel"></div>
+    <div id="ticker-wrap">
+      <div class="ticker">
+        <div class="ticker__item"> forecast </div>
+      </div>
+    </div>
+
+  </div>
   <script src="public/js/forecast.js"></script>
 </body>
 </html>

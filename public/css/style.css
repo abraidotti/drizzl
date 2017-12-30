@@ -37,38 +37,40 @@ h3 {
   margin: 0 auto;
   display: inline-block;
   float: left;
-  width: 60vw;
+  width: 75vw;
   height: 80vh;
-  padding: 5%;
+  padding-bottom: 10vh;
+  border-radius: 5px;
+  box-shadow: inset 0 0 20px rgb(0, 255, 0);
 }
 
 #control-panel {
-  margin: 0 auto;
   background-color: darkgreen;
-  /* border: 1px solid green; */
   display: inline-block;
-  float: right;
-  width: 17vw;
-  height: 90vh;
+  float: left;
+  width: 23vw;
+  height: 80vh;
+  padding-bottom: 10vh;
 }
 
-button {
+#control-panel button {
+  display: inline-block;
+  width: 80%;
+  margin: 0 auto;
   background-color: transparent;
   border: 1px solid black;
   color: #fefbef;
   font-family: 'Open Sans', sans-serif;
-  font-weight: 600;
-  line-height: 1;
-  margin-top: 1rem;
-  width: auto;
 }
 
-#ticker {
-  display: inline-block;
+#ticker-wrap {
   position: relative;
-  width: 100vw;
-  height: 10vh;
-  background-color: lightsalmon;
+  bottom: 0;
+  width: 100%;
+  overflow: hidden;
+  height: 4rem;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding-left: 100%;
 }
 
 @keyframes ticker {
@@ -79,15 +81,6 @@ button {
   100% {
     transform: translate3d(-100%, 0, 0);
   }
-}
-.ticker-wrap {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  overflow: hidden;
-  height: 4rem;
-  background-color: rgba(0, 0, 0, 0.9);
-  padding-left: 100%;
 }
 
 .ticker {
