@@ -4,21 +4,19 @@
   <meta charset="utf-8">
   <title>Drizzl</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <h3><%= body %></h3>
-  <div id="wrapper">
-
-    <canvas id="forecast-canvas"></canvas>
-    <div id="control-panel"></div>
-    <div id="ticker-wrap">
-      <div class="ticker">
-        <div class="ticker__item"> forecast </div>
-      </div>
+  <canvas id="forecast-canvas"></canvas>
+  <div id="control-panel"></div>
+  <div id="ticker-wrap">
+    <div class="ticker">
+      <div class="ticker__item"></div>
     </div>
-
   </div>
+
   <script src="public/js/forecast.js"></script>
 </body>
 </html>
