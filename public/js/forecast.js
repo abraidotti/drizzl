@@ -28,7 +28,7 @@ function draw(){
   canvas.height = 4*document.documentElement.clientHeight/5;
 
   ctx.clearRect(0, 0, w, h);
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = 'color-dodge';
   for(var i = 0;i < particlesNum; i++){
     var temp = particles[i];
     var factor = 1;
@@ -37,6 +37,8 @@ function draw(){
 
        var temp2 = particles[j];
        ctx.linewidth = 0.5;
+
+       // if color count is more than 4, do something
 
        if(temp.rgba == temp2.rgba && findDistance(temp, temp2)<50){
           ctx.strokeStyle = temp.rgba;
@@ -152,8 +154,9 @@ Object.keys(forecast.currently).forEach(function(key) {
     // if the key's value is a number
     if (!isNaN(forecast.currently[`${key}`])) {
       forecastModifier = Math.round(forecast.currently[`${key}`]);
-      console.log(`canvas fill color is ${canvasContext.fillStyle}`);
-      canvasContext.fillStyle = 'white';
+      // if the number is less than than 100;
+      // particlesNum = forecastModifier;
+      // draw();
     } else {
       console.log("key value is " + forecast.currently.key);
     }
