@@ -3,101 +3,169 @@ const forecast = JSON.parse(document.querySelector("H3").textContent);
 document.querySelector("H3").remove();
 console.log(forecast);
 const canvas = document.querySelector("#forecast-canvas");
+const ctx = canvas.getContext("2d");
 
-// set some variables
-var ctx = canvas.getContext('2d'),
-  particles = [],
+// set variables
+var  particles = [],
   particlesNum = 100,
-  w = 4*document.documentElement.clientWidth/5,
-  h = 4*document.documentElement.clientHeight/5,
-  colors = ['#f35d4f','#f36849','#c0d988','#6ddaf1','#f1e85b'];
+  w = 4 * document.documentElement.clientWidth / 5,
+  h = 4 * document.documentElement.clientHeight / 5,
+  colors = ["#f35d4f", "#f36849", "#c0d988", "#6ddaf1", "#f1e85b"],
+  circleSize = 2,
+  circleSizeVariation = 2,
+  outerArcDistance = 2,
+  horizontalVelocity = 1.1,
+  verticalVelocity = 1.1,
+  gco = [
+    "source-over",
+    "source-in",
+    "source-out",
+    "source-atop",
+    "destination-over",
+    "destination-in",
+    "destination-out",
+    "destination-atop",
+    "lighter",
+    "copy",
+    "xor",
+    "multiply",
+    "screen",
+    "overlay",
+    "darken",
+    "lighten",
+    "color-dodge",
+    "color-burn",
+    "hard-light",
+    "soft-light",
+    "difference",
+    "exclusion",
+    "hue",
+    "saturation",
+    "color",
+    "luminosity"
+  ],
+  gcoText = [
+    "This is the default setting and draws new shapes on top of the existing canvas content.",
+    "The new shape is drawn only where both the new shape and the destination canvas overlap. Everything else is made transparent.",
+    "The new shape is drawn where it doesn't overlap the existing canvas content.",
+    "The new shape is only drawn where it overlaps the existing canvas content.",
+    "New shapes are drawn behind the existing canvas content.",
+    "The existing canvas content is kept where both the new shape and existing canvas content overlap. Everything else is made transparent.",
+    "The existing content is kept where it doesn't overlap the new shape.",
+    "The existing canvas is only kept where it overlaps the new shape. The new shape is drawn behind the canvas content.",
+    "Where both shapes overlap the color is determined by adding color values.",
+    "Only the new shape is shown.",
+    "Shapes are made transparent where both overlap and drawn normal everywhere else.",
+    "The pixels are of the top layer are multiplied with the corresponding pixel of the bottom layer. A darker picture is the result.",
+    "The pixels are inverted, multiplied, and inverted again. A lighter picture is the result (opposite of multiply)",
+    "A combination of multiply and screen. Dark parts on the base layer become darker, and light parts become lighter.",
+    "Retains the darkest pixels of both layers.",
+    "Retains the lightest pixels of both layers.",
+    "Divides the bottom layer by the inverted top layer.",
+    "Divides the inverted bottom layer by the top layer, and then inverts the result.",
+    "A combination of multiply and screen like overlay, but with top and bottom layer swapped.",
+    "A softer version of hard-light. Pure black or white does not result in pure black or white.",
+    "Subtracts the bottom layer from the top layer or the other way round to always get a positive value.",
+    "Like difference, but with lower contrast.",
+    "Preserves the luma and chroma of the bottom layer, while adopting the hue of the top layer.",
+    "Preserves the luma and hue of the bottom layer, while adopting the chroma of the top layer.",
+    "Preserves the luma of the bottom layer, while adopting the hue and chroma of the top layer.",
+    "Preserves the hue and chroma of the bottom layer, while adopting the luma of the top layer."
+  ];
 
 // make a particle generator
-function Factory(){
-  this.x =  Math.round( Math.random() * w);
-  this.y =  Math.round( Math.random() * h);
-  this.rad = Math.round( Math.random() * 1) + 1;
-  this.rgba = colors[ Math.round( Math.random() * 3) ];
-  this.vx = Math.round( Math.random() * 3) - 1.5;
-  this.vy = Math.round( Math.random() * 3) - 1.5;
+function Factory() {
+  // get coordinates
+  this.x = Math.round(Math.random() * w);
+  this.y = Math.round(Math.random() * h);
+  // get size
+  this.rad = Math.round(Math.random() * circleSizeVariation) + circleSize;
+  // get color
+  this.rgba = colors[Math.round(Math.random() * 3)];
+  // get velocity
+  this.vx = Math.round(Math.random() * 3) - horizontalVelocity;
+  this.vy = Math.round(Math.random() * 3) - verticalVelocity;
 }
 
-function draw(){
+function draw() {
   // automatically resize the canvas
-  canvas.width = 4*document.documentElement.clientWidth/5;
-  canvas.height = 4*document.documentElement.clientHeight/5;
+  canvas.width = 4 * document.documentElement.clientWidth / 5;
+  canvas.height = 4 * document.documentElement.clientHeight / 5;
 
   ctx.clearRect(0, 0, w, h);
-  ctx.globalCompositeOperation = 'color-dodge';
-  for(var i = 0;i < particlesNum; i++){
-    var temp = particles[i];
-    var factor = 1;
 
-    for(var j = 0; j<particlesNum; j++){
+  for (let i = 0; i < particlesNum; i++) {
+    let temp = particles[i];
+    let factor = circleSize;
 
-       var temp2 = particles[j];
-       ctx.linewidth = 0.5;
+    for (let j = 0; j < particlesNum; j++) {
+      let temp2 = particles[j];
 
-       // if color count is more than 4, do something
+      // if colors.length > 4, do something
 
-       if(temp.rgba == temp2.rgba && findDistance(temp, temp2)<50){
-          ctx.strokeStyle = temp.rgba;
-          ctx.beginPath();
-          ctx.moveTo(temp.x, temp.y);
-          ctx.lineTo(temp2.x, temp2.y);
-          ctx.stroke();
-          factor++;
-       }
+      if (temp.rgba == temp2.rgba && findDistance(temp, temp2) < 50) {
+        ctx.strokeStyle = temp.rgba;
+        ctx.beginPath();
+        ctx.moveTo(temp.x, temp.y);
+        ctx.lineTo(temp2.x, temp2.y);
+        ctx.stroke();
+        factor++;
+      }
     }
-
 
     ctx.fillStyle = temp.rgba;
     ctx.strokeStyle = temp.rgba;
 
     ctx.beginPath();
-    ctx.arc(temp.x, temp.y, temp.rad*factor, 0, Math.PI*2, true);
+    ctx.arc(temp.x, temp.y, temp.rad * factor, 0, Math.PI * 2, true);
     ctx.fill();
     ctx.closePath();
 
     ctx.beginPath();
-    ctx.arc(temp.x, temp.y, (temp.rad+5)*factor, 0, Math.PI*2, true);
+    ctx.arc(
+      temp.x,
+      temp.y,
+      (temp.rad + outerArcDistance) * factor,
+      0,
+      Math.PI * 2,
+      true
+    );
     ctx.stroke();
     ctx.closePath();
-
 
     temp.x += temp.vx;
     temp.y += temp.vy;
 
-    if(temp.x > w)temp.x = 0;
-    if(temp.x < 0)temp.x = w;
-    if(temp.y > h)temp.y = 0;
-    if(temp.y < 0)temp.y = h;
+    if (temp.x > w) temp.x = 0;
+    if (temp.x < 0) temp.x = w;
+    if (temp.y > h) temp.y = 0;
+    if (temp.y < 0) temp.y = h;
   }
 }
 
-function findDistance(p1,p2){
-  return Math.sqrt( Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2) );
+function findDistance(p1, p2) {
+  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 }
 
-window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame       ||
-          function( callback ){
-            window.setTimeout(callback, 1000 / 60);
-          };
+window.requestAnimFrame = (function() {
+  return (
+    window.requestAnimationFrame ||
+    function(callback) {
+      window.setTimeout(callback, 1000 / 60);
+    }
+  );
 })();
 
-(function init(){
-  for(var i = 0; i < particlesNum; i++){
-    particles.push(new Factory);
+(function init() {
+  for (var i = 0; i < particlesNum; i++) {
+    particles.push(new Factory());
   }
 })();
 
-(function loop(){
+(function loop() {
   draw();
   requestAnimFrame(loop);
 })();
-
-
 
 // create a button for each key/value in the forecast
 const controlPanel = document.querySelector("#control-panel");
@@ -109,14 +177,10 @@ let ticker = document.querySelector(".ticker");
 let sendToTicker = document.createElement("DIV");
 sendToTicker.setAttribute("class", "ticker__item");
 // format those forecast keys to be more readable.
-sendToTicker.innerHTML = `${Math.round(forecast.currently.apparentTemperature)}°F and ${forecast.currently.summary.toLowerCase()}`;
+sendToTicker.innerHTML = `${Math.round(
+  forecast.currently.apparentTemperature
+)}°F and ${forecast.currently.summary.toLowerCase()}`;
 ticker.appendChild(sendToTicker);
-
-// // make a header
-// let controlPanelHeader = document.createElement("H1");
-// controlPanelHeader.innerHTML =
-//   forecast.currently.summary + " " + forecast.currently.apparentTemperature;
-// controlPanel.appendChild(controlPanelHeader);
 
 // for each key, make a button that sends the value to the ticker
 Object.keys(forecast.currently).forEach(function(key) {
@@ -133,8 +197,25 @@ Object.keys(forecast.currently).forEach(function(key) {
   if (key != "time" && key != "icon" && key != "summary")
     controlPanel.appendChild(btn);
 
-  // send the value over to the ticker
   btn.addEventListener("click", function(event) {
+    // if the key's value is a number
+    if (!isNaN(forecast.currently[`${key}`])) {
+      forecastModifier = Math.round(forecast.currently[`${key}`]);
+      // if the number is less than than 100;
+      // particlesNum = forecastModifier;
+      // draw();
+    }
+
+    // set the composite operation (0-25)
+    ctx.globalCompositeOperation = gco[3];
+    console.log(gcoText[3]);
+
+
+    // to toggle a css class:
+    // btn.classList.toggle("activated");
+
+    // if the button has the activated class, particlesNum += key values
+
     // send the button's value to the ticker.
     let ticker = document.querySelector(".ticker");
     let sendToTicker = document.createElement("DIV");
@@ -151,14 +232,7 @@ Object.keys(forecast.currently).forEach(function(key) {
     }
     // and then add this one
     ticker.appendChild(sendToTicker);
-    // if the key's value is a number
-    if (!isNaN(forecast.currently[`${key}`])) {
-      forecastModifier = Math.round(forecast.currently[`${key}`]);
-      // if the number is less than than 100;
-      // particlesNum = forecastModifier;
-      // draw();
-    } else {
-      console.log("key value is " + forecast.currently.key);
-    }
+
+
   }); // end button click function
 });
