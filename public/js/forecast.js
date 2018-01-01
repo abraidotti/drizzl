@@ -2,15 +2,19 @@
 const forecast = JSON.parse(document.querySelector("H3").textContent);
 document.querySelector("H3").remove();
 console.log(forecast);
+
+// render components
+const controlPanel = document.querySelector("#control-panel");
 const canvas = document.querySelector("#forecast-canvas");
 const ctx = canvas.getContext("2d");
+
 
 // set variables
 var  particles = [],
   particlesNum = 100,
   w = 4 * document.documentElement.clientWidth / 5,
   h = 4 * document.documentElement.clientHeight / 5,
-  colors = ["#f35d4f", "#f36849", "#c0d988", "#6ddaf1", "#f1e85b"],
+  colors = ["#f35d4f", "#f36849", "#c0d988", "#6ddaf1", "#f1e85b",'hsl('+ 360*Math.random() +',100%,50%)'],
   circleSize = 2,
   circleSizeVariation = 2,
   outerArcDistance = 2,
@@ -74,7 +78,7 @@ var  particles = [],
   ];
 
 // make a particle generator
-function Factory() {
+function Particle() {
   // get coordinates
   this.x = Math.round(Math.random() * w);
   this.y = Math.round(Math.random() * h);
@@ -82,6 +86,7 @@ function Factory() {
   this.rad = Math.round(Math.random() * circleSizeVariation) + circleSize;
   // get color
   this.rgba = colors[Math.round(Math.random() * 3)];
+  //this.fillStyle = 'hsl('+ 360*Math.random() +',100%,50%)';
   // get velocity
   this.vx = Math.round(Math.random() * 3) - horizontalVelocity;
   this.vy = Math.round(Math.random() * 3) - verticalVelocity;
@@ -158,7 +163,7 @@ window.requestAnimFrame = (function() {
 
 (function init() {
   for (var i = 0; i < particlesNum; i++) {
-    particles.push(new Factory());
+    particles.push(new Particle());
   }
 })();
 
@@ -166,11 +171,6 @@ window.requestAnimFrame = (function() {
   draw();
   requestAnimFrame(loop);
 })();
-
-// create a button for each key/value in the forecast
-const controlPanel = document.querySelector("#control-panel");
-// this is the number to send over to the forecast display
-var forecastModifier;
 
 // send the button's value to the ticker.
 let ticker = document.querySelector(".ticker");
@@ -200,7 +200,7 @@ Object.keys(forecast.currently).forEach(function(key) {
   btn.addEventListener("click", function(event) {
     // if the key's value is a number
     if (!isNaN(forecast.currently[`${key}`])) {
-      forecastModifier = Math.round(forecast.currently[`${key}`]);
+      let forecastModifier = Math.abs(Math.round(forecast.currently[`${key}`]));
       // if the number is less than than 100;
       // particlesNum = forecastModifier;
       // draw();
