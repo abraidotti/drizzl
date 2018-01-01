@@ -6,18 +6,26 @@ console.log(forecast);
 // render components
 const controlPanel = document.querySelector("#control-panel");
 const canvas = document.querySelector("#forecast-canvas");
+
 const ctx = canvas.getContext("2d");
 
-
 // set variables
-var  particles = [],
+var particles = [],
   particlesNum = 100,
   w = 4 * document.documentElement.clientWidth / 5,
   h = 4 * document.documentElement.clientHeight / 5,
-  colors = ["#f35d4f", "#f36849", "#c0d988", "#6ddaf1", "#f1e85b",'hsl('+ 360*Math.random() +',100%,50%)'],
+  colors = [
+    "#f35d4f",
+    "#f36849",
+    "#c0d988",
+    "#6ddaf1",
+    "#f1e85b",
+    "hsl(" + 360 * Math.random() + ",100%,50%)"
+  ],
   circleSize = 2,
   circleSizeVariation = 2,
-  outerArcDistance = 2,
+  outerCircleDistance = 2,
+  maxUmbilicalDistance = 50,
   horizontalVelocity = 1.1,
   verticalVelocity = 1.1,
   gco = [
@@ -100,21 +108,23 @@ function draw() {
   ctx.clearRect(0, 0, w, h);
 
   for (let i = 0; i < particlesNum; i++) {
+    // grab a circle
     let temp = particles[i];
-    let factor = circleSize;
 
+    //and then compare it to others
     for (let j = 0; j < particlesNum; j++) {
       let temp2 = particles[j];
 
-      // if colors.length > 4, do something
-
-      if (temp.rgba == temp2.rgba && findDistance(temp, temp2) < 50) {
+      // toggle a bizarre and rigid umbilicus among like circles.
+      if (
+        temp.rgba == temp2.rgba &&
+        findDistance(temp, temp2) < maxUmbilicalDistance
+      ) {
         ctx.strokeStyle = temp.rgba;
         ctx.beginPath();
         ctx.moveTo(temp.x, temp.y);
         ctx.lineTo(temp2.x, temp2.y);
         ctx.stroke();
-        factor++;
       }
     }
 
@@ -122,15 +132,16 @@ function draw() {
     ctx.strokeStyle = temp.rgba;
 
     ctx.beginPath();
-    ctx.arc(temp.x, temp.y, temp.rad * factor, 0, Math.PI * 2, true);
+    ctx.arc(temp.x, temp.y, temp.rad * circleSize, 0, Math.PI * 2, true);
     ctx.fill();
     ctx.closePath();
 
+    // draw an outer circle around the main circle
     ctx.beginPath();
     ctx.arc(
       temp.x,
       temp.y,
-      (temp.rad + outerArcDistance) * factor,
+      (temp.rad + outerCircleDistance) * circleSize,
       0,
       Math.PI * 2,
       true
@@ -210,7 +221,6 @@ Object.keys(forecast.currently).forEach(function(key) {
     ctx.globalCompositeOperation = gco[3];
     console.log(gcoText[3]);
 
-
     // to toggle a css class:
     // btn.classList.toggle("activated");
 
@@ -232,7 +242,5 @@ Object.keys(forecast.currently).forEach(function(key) {
     }
     // and then add this one
     ticker.appendChild(sendToTicker);
-
-
   }); // end button click function
 });
