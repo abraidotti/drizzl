@@ -1,13 +1,9 @@
 body {
   box-sizing: border-box;
   margin: 0;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 3vmin "Lucida Grande", Helvetica, Arial, sans-serif;
   background-color: black;
   color: white;
-}
-
-a {
-  color: #white;
 }
 
 h3 {
@@ -16,62 +12,83 @@ h3 {
 
 #index-canvas {
   display: inline-block;
-  margin: 0;
+  margin-top: 20vh;
+  margin-left: 25vw;
   width: 40vw;
   height: 40vh;
-  margin-left: 25vw;
-  margin-top: 20vh;
   float: left;
 }
 
 #location-form-container {
   display: inline-block;
-  border: 1px solid black;
   width: 20vw;
   height: 40vh;
   margin-top: 20vh;
   float: left;
+  color: white;
+  font-size: 3vmin;
+}
+
+#location-form-container input {
+  border: 0;
+  margin: 0.1vw;
+  border-radius: 0.3vw;
+  background-color: hsla(0, 100%, 100%, 0.7);
+}
+
+#wrapper {
+  display: grid;
+  grid-template-columns: 7fr 1fr;
+  grid-gap: 0;
+  grid-auto-rows: minmax(auto, auto);
 }
 
 #forecast-canvas {
-  padding: 0.3vw;
-  float: left;
-  border-radius: 5px;
-  box-shadow: inset 0 0 50px white;
+  grid-column: 1 / 2;
+  grid-row: 1;
+  padding: 0;
+  border-radius: 2vw;
+  box-shadow: inset 0 0 3vw hsl(20,60%,10%);
 }
 
 #control-panel {
-  background-color: white;
-  display: inline-block;
-  float: left;
-  width: 19vw;
-  height: 79vh;
+  grid-column: 2 / 2;
+  grid-row: 1;
+  background-color: hsl(40,60%,10%);
+  display: block;
   overflow-y: auto;
 }
 
 #control-panel button {
-  display: inline-block;
+  display: block;
   width: 10vw;
-  margin: 0 3vw;
-  background-color: grey;
-  border: 1px solid black;
+  height: 6vh;
+  margin: 0 auto;
+  padding: 0;
+  background-color: hsl(180,60%,10%);
+  border-radius: 1vw;
+  border: 0.1vw solid hsl(300,60%,10%);
   color: #fefbef;
   font-family: 'Open Sans', sans-serif;
-  font-size: 1.4vw;
+  font-size: 2vmin;
+}
+
+#control-panel button:hover {
+  background-color: hsl(10,60%,10%);
 }
 
 #control-panel button.activated {
-  background-color: lime;
-  border: 4px solid black;
+  background-color: hsl(100,60%,60%);
 }
 
 #ticker-wrap {
-  position: relative;
+  position: absolute;
   bottom: 0;
   width: 100%;
+  height: auto;
   overflow: hidden;
   height: 4rem;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: hsl(120,60%,60%);
   padding-left: 100%;
 }
 
@@ -87,7 +104,7 @@ h3 {
 
 #ticker {
   display: inline-block;
-  height: 4rem;
+  height: 10vh;
   line-height: 4rem;
   white-space: nowrap;
   padding-right: 100%;

@@ -10,6 +10,9 @@ const navigatorLocateButton = document.querySelector("#locate-with-browser");
 const locationInput = document.querySelector("#location-input");
 const locationButton = document.querySelector("#location-button");
 
+const appColor = 'hsla('+ 360 * Math.random() +', 80%, 80%, 0.7)';
+locationFormContainer.style.color = appColor;
+
 // navigator geolocation options
 const options = {
   enableHighAccuracy: true,
@@ -118,7 +121,7 @@ function readyLatLng(lat, lng) {
   locationFormContainer.appendChild(readyDiv);
 
   var readyDivHeader = document.createElement("H1");
-  readyDivHeader.textContent = "Location ready.";
+  readyDivHeader.textContent = "ready.";
   readyDiv.appendChild(readyDivHeader);
 
   var readyForm = document.createElement("FORM");
@@ -129,7 +132,7 @@ function readyLatLng(lat, lng) {
   var readyFormText = document.createElement("INPUT"); //input element, text
   readyFormText.setAttribute('type', "text");
   readyFormText.setAttribute('name', "locationstring");
-  readyFormText.setAttribute('size', "30");
+  readyFormText.setAttribute('size', "22");
   readyFormText.setAttribute('value', `${lat},${lng}`);
   readyForm.appendChild(readyFormText);
 
@@ -163,7 +166,7 @@ var particle = function() {
   //draw particle
   this.draw = function() {
     // particle interior color
-    ctx.fillStyle = 'hsl('+ 360*Math.random() +',15%,15%)';
+    ctx.fillStyle = appColor;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.d, 0, 2 * Math.PI);
     ctx.fill();

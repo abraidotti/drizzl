@@ -121,8 +121,8 @@ function Particle() {
 
 function draw() {
   // automatically resize the canvas
-  canvas.width = 4 * document.documentElement.clientWidth / 5;
-  canvas.height = 4 * document.documentElement.clientHeight / 5;
+  canvas.width = 7 * document.documentElement.clientWidth / 8;
+  canvas.height = 7 * document.documentElement.clientHeight / 8;
 
   ctx.clearRect(0, 0, w, h);
 
