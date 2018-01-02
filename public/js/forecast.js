@@ -22,10 +22,13 @@ var particles = [],
   circleSize = 2,
   circleSizeVariation = 2,
   outerCircleDistance = 2,
+  particleTransparencyModifier = 1,
   maxUmbilicalDistance = 50,
-  horizontalVelocity = 3,
-  verticalVelocity = 3,
-  velocityModifier = 3,
+  horizontalVelocity = (Math.round(forecast.currently.windSpeed / 10)),
+  verticalVelocity = (Math.round(forecast.currently.windGust / 10)),
+  velocityModifier = (Math.round(forecast.currently.windBearing / 60)),
+  horizontalVelocityModifier = 0,
+  verticalVelocityModifier = 0,
   gco = [
     "source-over",
     "source-in",
@@ -86,7 +89,7 @@ var particles = [],
 // set the composite operation (0-25) to the forecast's hours offset from UTC
 ctx.globalCompositeOperation = gco[Math.abs(forecast.offset)];
 console.log(
-  `The canvas's composite operation is '${gco[Math.abs(forecast.offset)]}.'`
+  `Based on the location's UTC offset of ${forecast.offset}, The canvas's composite operation is '${gco[Math.abs(forecast.offset)]}.'`
 );
 console.log(gcoText[Math.abs(forecast.offset)]);
 
@@ -132,7 +135,8 @@ function draw() {
       }
     }
 
-    // render the circle
+    // render a particle
+    ctx.globalAlpha = particleTransparencyModifier;
     ctx.fillStyle = temp.color;
     ctx.strokeStyle = temp.color;
     ctx.beginPath();
@@ -144,7 +148,7 @@ function draw() {
     ctx.fill();
     ctx.closePath();
 
-    // render an outer circle around the circle
+    // render an outer circle around the particle
     ctx.beginPath();
     ctx.arc(
       temp.x, temp.y,
@@ -154,9 +158,11 @@ function draw() {
     ctx.stroke();
     ctx.closePath();
 
-    // render movement
-    temp.x += temp.vx;
-    temp.y += temp.vy;
+    // render movement at constant velocity
+    temp.x += temp.vx + horizontalVelocityModifier;
+    temp.y += temp.vy + verticalVelocityModifier;
+
+    // wrap particles on canvas
     if (temp.x > w) temp.x = 0;
     if (temp.x < 0) temp.x = w;
     if (temp.y > h) temp.y = 0;
@@ -217,7 +223,45 @@ Object.keys(forecast.currently).forEach(function(key) {
 
     // listen for button clicks
     btn.addEventListener("click", function(event) {
-      let forecastModifier = forecast.currently[`${key}`];
+      forecastModifier = forecast.currently[`${key}`];
+
+      btn.classList.toggle("activated");
+
+      // if the key's value is a number, store its integer
+      if (btn.classList.contains("activated")) {
+        let tickerItem = document.createElement("DIV");
+        tickerItem.setAttribute("class", `ticker__item ${key}`);
+        tickerItem.textContent = `The ${btnReadableLabel} is
+        ${forecast.currently[`${key}`]}.`;
+        ticker.appendChild(tickerItem);
+        console.log(`${key} button activated.`);
+        if (key === 'nearestStormDistance'){
+          console.log(`${key}(${forecastModifier}) changes the distance among particle connections`);
+          maxUmbilicalDistance += Math.round(forecastModifier);
+        }
+        if (key === 'nearestStormBearing'){
+          console.log(`${key}(${forecastModifier}) affects the particles' relative velocity on load.`);
+          circleSize += 0.1;
+        }
+        if (key === 'precipIntensity'){
+          console.log(`${key}(${forecastModifier}) changes particles' vertical velocity.`);
+          verticalVelocityModifier += 1;
+        }
+        if (key === 'precipProbability'){
+          console.log(`${key}(${forecastModifier}) changes particles' outer circle distance.`);
+          outerCircleDistance += Math.round(forecastModifier / 100);
+        }
+        if (key === 'windSpeed'){
+          console.log(`${key}(${forecastModifier}) changes particles' horizontal velocity.`);
+          horizontalVelocityModifier += Math.round(forecastModifier / 10);
+        }
+        if (key === 'windGust'){
+          horizontalVelocityModifier += Math.round(forecastModifier / 10);
+        }
+        if (key === 'humidity'){
+          particleTransparencyModifier = forecast.currently.humidity;
+        }
+      }
 
       // circleSize = 2,
       // circleSizeVariation = 2,
@@ -228,46 +272,33 @@ Object.keys(forecast.currently).forEach(function(key) {
       // velocityModifier = 3,
 
       // Math.abs(Math.round(3 * forecast.currently.apparentTemperature))
-
-      //controlPanel.childNodes.forEach((child) => {child.classList.value = "" });
-      btn.classList.toggle("activated");
-
-      // if the key's value is a number, store its integer
-      if (btn.classList.contains("activated")) {
-        let tickerItem = document.createElement("DIV");
-        tickerItem.setAttribute("class", `ticker__item ${key}`);
-        tickerItem.textContent = `The ${btnReadableLabel} is
-        ${forecast.currently[`${key}`]}.`;
-        ticker.appendChild(tickerItem);
-        console.log(`${key} button activated. Value is ${forecastModifier}.`);
-        circleSize += 1;
-        if (key == 'nearestStormDistance'){
-          maxUmbilicalDistance += Math.round(forecastModifier);
-        }
-        if (key == 'windSpeed'){
-          velocityModifier += Math.round(forecastModifier);
-        }
-        if (key == 'visibility'){
-          ctx.globalAlpha = 0.5;
-        }
-      }
-
       if (!btn.classList.contains("activated")) {
         console.log(`${key} button deactivated.`);
         let tickerItemToDestroy = document.querySelector(`.${key}`);
         ticker.removeChild(tickerItemToDestroy);
-        circleSize -= 1;
-        if (key == 'nearestStormDistance'){
+        if (key === 'nearestStormDistance'){
           maxUmbilicalDistance -= Math.round(forecastModifier);
         }
-        if (key == 'windSpeed'){
-          velocityModifier -= Math.round(forecastModifier);
+        if (key === 'nearestStormBearing'){
+          circleSize -= 0.1;
         }
-        if (key == 'visibility'){
-          ctx.globalAlpha = 1;
+        if (key === 'precipIntensity'){
+          verticalVelocityModifier -= 1;
+        }
+        if (key === 'precipProbability'){
+          horizontalVelocityModifier -= 1;
+        }
+        if (key === 'windSpeed'){
+          horizontalVelocityModifier -= Math.round(forecastModifier / 10);
+        }
+        if (key === 'windGust'){
+          horizontalVelocityModifier -= Math.round(forecastModifier / 10);
+        }
+        if (key === 'humidity'){
+          particleTransparencyModifier = 1;
         }
       }
-      canvas.reload();
+
     }); // end button click function
     controlPanel.appendChild(btn);
   }
