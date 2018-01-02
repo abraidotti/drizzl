@@ -19,10 +19,16 @@ var particles = [],
     `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 180 ))}, 60%, 60%)`,
     `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 240 ))}, 60%, 60%)`
   ],
-  circleSize = 2,
-  circleSizeVariation = 2,
+  particleSize = 2,
+  particleSizeVariation = 2,
   outerCircleDistance = 2,
+  outerCircleWidth = 0,
+  outerCircleLineDashLineLength = 0,
+  outerCircleLineDashGapLength = 0,
   particleTransparencyModifier = 1,
+  umbilicalWidth = 0;
+  umbilicalLineDashLineLength = 0,
+  umbilicalLineDashGapLength = 0,
   maxUmbilicalDistance = 50,
   horizontalVelocity = (Math.round(forecast.currently.windSpeed / 10)),
   verticalVelocity = (Math.round(forecast.currently.windGust / 10)),
@@ -99,7 +105,7 @@ function Particle() {
   this.x = Math.round(Math.random() * w);
   this.y = Math.round(Math.random() * h);
   // get size
-  this.rad = Math.round(Math.random() * circleSizeVariation) + circleSize;
+  this.rad = Math.round(Math.random() * particleSizeVariation) + particleSize;
   // get color
   this.color = colors[Math.round(Math.random() * (colors.length - 1))];
   // get velocity
@@ -128,6 +134,8 @@ function draw() {
         findDistance(temp, temp2) < maxUmbilicalDistance
       ) {
         ctx.strokeStyle = temp.color;
+        ctx.lineWidth = 1 + umbilicalWidth;
+        ctx.setLineDash([umbilicalLineDashLineLength, umbilicalLineDashGapLength]);
         ctx.beginPath();
         ctx.moveTo(temp.x, temp.y);
         ctx.lineTo(temp2.x, temp2.y);
@@ -139,20 +147,23 @@ function draw() {
     ctx.globalAlpha = particleTransparencyModifier;
     ctx.fillStyle = temp.color;
     ctx.strokeStyle = temp.color;
+    ctx.setLineDash([0, 0]);
     ctx.beginPath();
     ctx.arc(
       temp.x, temp.y,
-      temp.rad * circleSize,
+      temp.rad * particleSize,
       0, Math.PI * 2, true
     );
     ctx.fill();
     ctx.closePath();
 
     // render an outer circle around the particle
+    ctx.setLineDash([outerCircleLineDashLineLength, outerCircleLineDashGapLength]);
+    ctx.lineWidth = 1 + outerCircleWidth;
     ctx.beginPath();
     ctx.arc(
       temp.x, temp.y,
-      (temp.rad + outerCircleDistance) * circleSize,
+      (temp.rad + outerCircleDistance) * particleSize,
       0, Math.PI * 2, true
     );
     ctx.stroke();
@@ -209,7 +220,7 @@ window.requestAnimFrame = (function() {
 // iterate through each forecast key
 Object.keys(forecast.currently).forEach(function(key) {
   // if the key's value is numerical
-  if (key != "time" && key != "icon" && key != "summary") {
+  if (key != "time" && key != "icon" && key != "summary" && key != "temperature" && key != "apparentTemperature") {
     // make a control panel button
     let btn = document.createElement("BUTTON");
     btn.setAttribute("id", `btn-${key}`);
@@ -236,35 +247,67 @@ Object.keys(forecast.currently).forEach(function(key) {
         ticker.appendChild(tickerItem);
         console.log(`${key} button activated.`);
         if (key === 'nearestStormDistance'){
-          console.log(`${key}(${forecastModifier}) changes the distance among particle connections`);
+          console.log(`${key}(${forecastModifier}) changes the maximum particle link distance.`);
           maxUmbilicalDistance += Math.round(forecastModifier);
         }
         if (key === 'nearestStormBearing'){
-          console.log(`${key}(${forecastModifier}) affects the particles' relative velocity on load.`);
-          circleSize += 0.1;
+          console.log(`${key}(${forecastModifier}) changes particle size.`);
+          particleSize += Math.round(forecastModifier / 100);
         }
         if (key === 'precipIntensity'){
-          console.log(`${key}(${forecastModifier}) changes particles' vertical velocity.`);
+          console.log(`${key}(${forecastModifier}) changes particle vertical velocity.`);
           verticalVelocityModifier += 1;
         }
         if (key === 'precipProbability'){
-          console.log(`${key}(${forecastModifier}) changes particles' outer circle distance.`);
-          outerCircleDistance += Math.round(forecastModifier / 100);
+          console.log(`${key}(${forecastModifier}) changes particle outer circle distance.`);
+          outerCircleDistance += Math.round(forecastModifier / 10);
+        }
+        if (key === 'dewPoint'){
+          console.log(`${key}(${forecastModifier}) changes outer circle line composition.`);
+          outerCircleLineDashLineLength += Math.round(forecastModifier / 100);
+          outerCircleLineDashGapLength += Math.round(forecastModifier / 100);
+        }
+        if (key === 'humidity'){
+          console.log(`${key}(${forecastModifier}) changes particle transparency.`);
+          particleTransparencyModifier = forecastModifier;
+        }
+        if (key === 'pressure'){
+          console.log(`${key}(${forecastModifier}) changes particle size.`);
+          particleSize += Math.round(forecastModifier / 1000);
         }
         if (key === 'windSpeed'){
-          console.log(`${key}(${forecastModifier}) changes particles' horizontal velocity.`);
+          console.log(`${key}(${forecastModifier}) changes particle horizontal velocity.`);
           horizontalVelocityModifier += Math.round(forecastModifier / 10);
         }
         if (key === 'windGust'){
+          console.log(`${key}(${forecastModifier}) changes particle horizontal velocity.`);
           horizontalVelocityModifier += Math.round(forecastModifier / 10);
         }
-        if (key === 'humidity'){
-          particleTransparencyModifier = forecast.currently.humidity;
+        if (key === 'windBearing'){
+          console.log(`${key}(${forecastModifier}) changes particle vertical velocity.`);
+          verticalVelocityModifier += Math.round(forecastModifier / 100);
+        }
+        if (key === 'cloudCover'){
+          console.log(`${key}(${forecastModifier}) changes particle link line composition.`);
+          umbilicalLineDashLineLength += Math.round(forecastModifier);
+          umbilicalLineDashGapLength += Math.round(forecastModifier);
+        }
+        if (key === 'uvIndex'){
+          console.log(`${key}(${forecastModifier}) changes particle link width.`);
+          umbilicalWidth = forecastModifier;
+        }
+        if (key === 'visibility'){
+          console.log(`${key}(${forecastModifier}) changes particle size.`);
+          particleSize += forecastModifier;
+        }
+        if (key === 'ozone'){
+          console.log(`${key}(${forecastModifier}) changes outer circle width.`);
+          outerCircleWidth = Math.round(forecastModifier / 100);
         }
       }
 
-      // circleSize = 2,
-      // circleSizeVariation = 2,
+      // particleSize = 2,
+      // particleSizeVariation = 2,
       // outerCircleDistance = 2,
       // maxUmbilicalDistance = 50,
       // horizontalVelocity = 1.1,
@@ -280,13 +323,23 @@ Object.keys(forecast.currently).forEach(function(key) {
           maxUmbilicalDistance -= Math.round(forecastModifier);
         }
         if (key === 'nearestStormBearing'){
-          circleSize -= 0.1;
+          particleSize -= Math.round(forecastModifier / 100);
         }
         if (key === 'precipIntensity'){
           verticalVelocityModifier -= 1;
         }
         if (key === 'precipProbability'){
-          horizontalVelocityModifier -= 1;
+          outerCircleDistance -= Math.round(forecastModifier / 10);
+        }
+        if (key === 'dewPoint'){
+          outerCircleLineDashLineLength -= Math.round(forecastModifier / 100);
+          outerCircleLineDashGapLength -= Math.round(forecastModifier / 100);
+        }
+        if (key === 'humidity'){
+          particleTransparencyModifier = 1;
+        }
+        if (key === 'pressure'){
+          particleSize -= Math.round(forecastModifier / 1000);
         }
         if (key === 'windSpeed'){
           horizontalVelocityModifier -= Math.round(forecastModifier / 10);
@@ -294,8 +347,22 @@ Object.keys(forecast.currently).forEach(function(key) {
         if (key === 'windGust'){
           horizontalVelocityModifier -= Math.round(forecastModifier / 10);
         }
-        if (key === 'humidity'){
-          particleTransparencyModifier = 1;
+        if (key === 'windBearing'){
+          verticalVelocityModifier -= Math.round(forecastModifier / 100);
+        }
+        if (key === 'cloudCover'){
+          umbilicalLineDashLineLength -= Math.round(forecastModifier);
+          umbilicalLineDashGapLength -= Math.round(forecastModifier);
+        }
+
+        if (key === 'uvIndex'){
+          umbilicalWidth = 0;
+        }
+        if (key === 'visibility'){
+          particleSize -= forecastModifier;
+        }
+        if (key === 'ozone'){
+          outerCircleWidth = 0;
         }
       }
 
