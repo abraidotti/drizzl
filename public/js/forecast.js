@@ -6,28 +6,26 @@ console.log(forecast);
 // render components
 const controlPanel = document.querySelector("#control-panel");
 const canvas = document.querySelector("#forecast-canvas");
-
+const ticker = document.querySelector("#ticker");
 const ctx = canvas.getContext("2d");
 
 // set variables
 var particles = [],
-  particlesNum = 100,
+  particlesNum = (Math.abs(Math.round(forecast.currently.temperature))),
   w = 4 * document.documentElement.clientWidth / 5,
   h = 4 * document.documentElement.clientHeight / 5,
   colors = [
-    "#f35d4f",
-    "#f36849",
-    "#c0d988",
-    "#6ddaf1",
-    "#f1e85b",
-    "hsl(" + 360 * Math.random() + ",100%,50%)"
+    `hsl(${Math.abs(Math.round(3 * forecast.currently.temperature))}, 60%, 60%)`,
+    `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 180 ))}, 60%, 60%)`,
+    `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 240 ))}, 60%, 60%)`
   ],
   circleSize = 2,
   circleSizeVariation = 2,
   outerCircleDistance = 2,
   maxUmbilicalDistance = 50,
-  horizontalVelocity = 1.1,
-  verticalVelocity = 1.1,
+  horizontalVelocity = 3,
+  verticalVelocity = 3,
+  velocityModifier = 3,
   gco = [
     "source-over",
     "source-in",
@@ -85,6 +83,13 @@ var particles = [],
     "Preserves the hue and chroma of the bottom layer, while adopting the luma of the top layer."
   ];
 
+// set the composite operation (0-25) to the forecast's hours offset from UTC
+ctx.globalCompositeOperation = gco[Math.abs(forecast.offset)];
+console.log(
+  `The canvas's composite operation is '${gco[Math.abs(forecast.offset)]}.'`
+);
+console.log(gcoText[Math.abs(forecast.offset)]);
+
 // make a particle generator
 function Particle() {
   // get coordinates
@@ -93,11 +98,10 @@ function Particle() {
   // get size
   this.rad = Math.round(Math.random() * circleSizeVariation) + circleSize;
   // get color
-  this.rgba = colors[Math.round(Math.random() * 3)];
-  //this.fillStyle = 'hsl('+ 360*Math.random() +',100%,50%)';
+  this.color = colors[Math.round(Math.random() * (colors.length - 1))];
   // get velocity
-  this.vx = Math.round(Math.random() * 3) - horizontalVelocity;
-  this.vy = Math.round(Math.random() * 3) - verticalVelocity;
+  this.vx = Math.round(Math.random() * velocityModifier) - horizontalVelocity;
+  this.vy = Math.round(Math.random() * velocityModifier) - verticalVelocity;
 }
 
 function draw() {
@@ -107,20 +111,20 @@ function draw() {
 
   ctx.clearRect(0, 0, w, h);
 
+  // grab a circle
   for (let i = 0; i < particlesNum; i++) {
-    // grab a circle
     let temp = particles[i];
 
     //and then compare it to others
     for (let j = 0; j < particlesNum; j++) {
       let temp2 = particles[j];
 
-      // toggle a bizarre and rigid umbilicus among like circles.
+      // toggle a bizarre and rigid umbilicus among like and close circles
       if (
-        temp.rgba == temp2.rgba &&
+        temp.color == temp2.color &&
         findDistance(temp, temp2) < maxUmbilicalDistance
       ) {
-        ctx.strokeStyle = temp.rgba;
+        ctx.strokeStyle = temp.color;
         ctx.beginPath();
         ctx.moveTo(temp.x, temp.y);
         ctx.lineTo(temp2.x, temp2.y);
@@ -128,34 +132,47 @@ function draw() {
       }
     }
 
-    ctx.fillStyle = temp.rgba;
-    ctx.strokeStyle = temp.rgba;
-
+    // render the circle
+    ctx.fillStyle = temp.color;
+    ctx.strokeStyle = temp.color;
     ctx.beginPath();
-    ctx.arc(temp.x, temp.y, temp.rad * circleSize, 0, Math.PI * 2, true);
+    ctx.arc(
+      temp.x, temp.y,
+      temp.rad * circleSize,
+      0, Math.PI * 2, true
+    );
     ctx.fill();
     ctx.closePath();
 
-    // draw an outer circle around the main circle
+    // render an outer circle around the circle
     ctx.beginPath();
     ctx.arc(
-      temp.x,
-      temp.y,
+      temp.x, temp.y,
       (temp.rad + outerCircleDistance) * circleSize,
-      0,
-      Math.PI * 2,
-      true
+      0, Math.PI * 2, true
     );
     ctx.stroke();
     ctx.closePath();
 
+    // render movement
     temp.x += temp.vx;
     temp.y += temp.vy;
-
     if (temp.x > w) temp.x = 0;
     if (temp.x < 0) temp.x = w;
     if (temp.y > h) temp.y = 0;
     if (temp.y < 0) temp.y = h;
+  }
+
+  // load the temperature (F) and forecast summary into the ticker
+  if (ticker.childElementCount === 0) {
+    let tickerGreeting = document.createElement("DIV");
+    tickerGreeting.setAttribute("class", "ticker__item");
+    // render a forecast greeting
+    tickerGreeting.innerHTML = `${Math.round(
+      forecast.currently.apparentTemperature
+    )}°F
+      and ${forecast.currently.summary.toLowerCase()}`;
+    ticker.appendChild(tickerGreeting);
   }
 }
 
@@ -183,64 +200,75 @@ window.requestAnimFrame = (function() {
   requestAnimFrame(loop);
 })();
 
-// send the button's value to the ticker.
-let ticker = document.querySelector(".ticker");
-let sendToTicker = document.createElement("DIV");
-sendToTicker.setAttribute("class", "ticker__item");
-// format those forecast keys to be more readable.
-sendToTicker.innerHTML = `${Math.round(
-  forecast.currently.apparentTemperature
-)}°F and ${forecast.currently.summary.toLowerCase()}`;
-ticker.appendChild(sendToTicker);
-
-// for each key, make a button that sends the value to the ticker
+// iterate through each forecast key
 Object.keys(forecast.currently).forEach(function(key) {
-  let btn = document.createElement("BUTTON");
-  btn.setAttribute("id", `btn-${key}`);
-  btn.setAttribute("value", `${key}`);
-  // make the labels readable
-  let btnReadableLabel = key
-    .split(/(?=[A-Z])/)
-    .join(" ")
-    .toLowerCase();
-  btn.innerHTML = btnReadableLabel;
-  // let's exclude non-numerical values and the time.
-  if (key != "time" && key != "icon" && key != "summary")
+  // if the key's value is numerical
+  if (key != "time" && key != "icon" && key != "summary") {
+    // make a control panel button
+    let btn = document.createElement("BUTTON");
+    btn.setAttribute("id", `btn-${key}`);
+    btn.setAttribute("value", `${key}`);
+    // label the button with a readable key name
+    let btnReadableLabel = key
+      .split(/(?=[A-Z])/)
+      .join(" ")
+      .toLowerCase();
+    btn.innerHTML = btnReadableLabel;
+
+    // listen for button clicks
+    btn.addEventListener("click", function(event) {
+      let forecastModifier = forecast.currently[`${key}`];
+
+      // circleSize = 2,
+      // circleSizeVariation = 2,
+      // outerCircleDistance = 2,
+      // maxUmbilicalDistance = 50,
+      // horizontalVelocity = 1.1,
+      // verticalVelocity = 1.1,
+      // velocityModifier = 3,
+
+      // Math.abs(Math.round(3 * forecast.currently.apparentTemperature))
+
+      //controlPanel.childNodes.forEach((child) => {child.classList.value = "" });
+      btn.classList.toggle("activated");
+
+      // if the key's value is a number, store its integer
+      if (btn.classList.contains("activated")) {
+        let tickerItem = document.createElement("DIV");
+        tickerItem.setAttribute("class", `ticker__item ${key}`);
+        tickerItem.textContent = `The ${btnReadableLabel} is
+        ${forecast.currently[`${key}`]}.`;
+        ticker.appendChild(tickerItem);
+        console.log(`${key} button activated. Value is ${forecastModifier}.`);
+        circleSize += 1;
+        if (key == 'nearestStormDistance'){
+          maxUmbilicalDistance += Math.round(forecastModifier);
+        }
+        if (key == 'windSpeed'){
+          velocityModifier += Math.round(forecastModifier);
+        }
+        if (key == 'visibility'){
+          ctx.globalAlpha = 0.5;
+        }
+      }
+
+      if (!btn.classList.contains("activated")) {
+        console.log(`${key} button deactivated.`);
+        let tickerItemToDestroy = document.querySelector(`.${key}`);
+        ticker.removeChild(tickerItemToDestroy);
+        circleSize -= 1;
+        if (key == 'nearestStormDistance'){
+          maxUmbilicalDistance -= Math.round(forecastModifier);
+        }
+        if (key == 'windSpeed'){
+          velocityModifier -= Math.round(forecastModifier);
+        }
+        if (key == 'visibility'){
+          ctx.globalAlpha = 1;
+        }
+      }
+      canvas.reload();
+    }); // end button click function
     controlPanel.appendChild(btn);
-
-  btn.addEventListener("click", function(event) {
-    // if the key's value is a number
-    if (!isNaN(forecast.currently[`${key}`])) {
-      let forecastModifier = Math.abs(Math.round(forecast.currently[`${key}`]));
-      // if the number is less than than 100;
-      // particlesNum = forecastModifier;
-      // draw();
-    }
-
-    // set the composite operation (0-25)
-    ctx.globalCompositeOperation = gco[3];
-    console.log(gcoText[3]);
-
-    // to toggle a css class:
-    // btn.classList.toggle("activated");
-
-    // if the button has the activated class, particlesNum += key values
-
-    // send the button's value to the ticker.
-    let ticker = document.querySelector(".ticker");
-    let sendToTicker = document.createElement("DIV");
-    sendToTicker.setAttribute("class", "ticker__item");
-    // format those forecast keys to be more readable.
-    sendToTicker.textContent = `The ${btnReadableLabel} is ${
-      forecast.currently[`${key}`]
-    }.`;
-    console.log(`${key} is ${forecast.currently[`${key}`]}.`);
-
-    // set a max of 7 ticker elements
-    while (ticker.childElementCount > 7) {
-      ticker.removeChild(ticker.firstChild);
-    }
-    // and then add this one
-    ticker.appendChild(sendToTicker);
-  }); // end button click function
+  }
 });

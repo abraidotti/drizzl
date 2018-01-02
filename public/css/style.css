@@ -37,15 +37,15 @@ h3 {
   padding: 0.3vw;
   float: left;
   border-radius: 5px;
-  box-shadow: inset 0 0 50px rgb(0, 255, 0);
+  box-shadow: inset 0 0 50px white;
 }
 
 #control-panel {
-  background-color: darkgreen;
+  background-color: white;
   display: inline-block;
   float: left;
   width: 19vw;
-  height: 80vh;
+  height: 79vh;
   overflow-y: auto;
 }
 
@@ -53,11 +53,16 @@ h3 {
   display: inline-block;
   width: 10vw;
   margin: 0 3vw;
-  background-color: transparent;
+  background-color: grey;
   border: 1px solid black;
   color: #fefbef;
   font-family: 'Open Sans', sans-serif;
   font-size: 1.4vw;
+}
+
+#control-panel button.activated {
+  background-color: lime;
+  border: 4px solid black;
 }
 
 #ticker-wrap {
@@ -80,7 +85,7 @@ h3 {
   }
 }
 
-.ticker {
+#ticker {
   display: inline-block;
   height: 4rem;
   line-height: 4rem;
