@@ -1,5 +1,10 @@
 var forecast, forecastLoader, crd, userLat, userLong;
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 2 * document.documentElement.clientWidth / 5;
+canvas.height = 2 * document.documentElement.clientHeight / 5;
 
+const locationFormContainer = document.querySelector("#location-form-container");
 const navigatorLocateButton = document.querySelector("#locate-with-browser");
 const locationInput = document.querySelector("#location-input");
 const locationButton = document.querySelector("#location-button");
@@ -12,7 +17,7 @@ const options = {
 
 // if user hits the "get my location button":
 navigatorLocateButton.addEventListener('click', function(){
-  showLoader();
+  // make a request for the user's geolocation
   navigator.geolocation.getCurrentPosition(success, error, options);
 
   // if successful grab, set coordinates
@@ -21,7 +26,7 @@ navigatorLocateButton.addEventListener('click', function(){
     userLat = crd.latitude;
     userLng = crd.longitude;
 
-    // tell the user what's found
+    // log what's found
     console.log("Location found.");
     console.log("Your current position is:");
     console.log(`Latitude : ${userLat}`);
@@ -39,12 +44,9 @@ locationButton.addEventListener("click", function(event) {
   // prevent page reload on form submission
   event.preventDefault();
 
-  var submittedLocation = locationInput.value;
-
-  showLoader();
   // geocode the user's location
   var geocoder = new google.maps.Geocoder();
-  geocoder.geocode({ address: submittedLocation }, function(results,status){
+  geocoder.geocode({ address: locationInput.value }, function(results,status){
     if (status === "OK") {
       var geoLocation = results[0].geometry.location
         .toString()
@@ -52,7 +54,7 @@ locationButton.addEventListener("click", function(event) {
       userLat = results[0].geometry.location.lat();
       userLng = results[0].geometry.location.lng();
 
-      // tell the user what's found
+      // log what's found
       console.log("Location found.");
       console.log("Your current position is:");
       console.log(`Latitude : ${userLat}`);
@@ -65,42 +67,6 @@ locationButton.addEventListener("click", function(event) {
   }); // end of geocode block
 }); // end of click function
 
-function showLoader(){
-  document.querySelector("#location-form").remove();
-  var locationFormContainer = document.querySelector("#location-form-container");
-  forecastLoader = document.createElement("CANVAS");
-  forecastLoader.setAttribute("id", "spinner");
-  forecastLoader.setAttribute("height", "locationFormContainer.height");
-  forecastLoader.setAttribute("width", "locationFormContainer.width");
-  locationFormContainer.appendChild(forecastLoader);
-
-  var context = canvas.getContext('2d');
-  var start = new Date();
-  var lines = 16,
-    cW = context.canvas.width,
-    cH = context.canvas.height;
-
-  var draw = function() {
-    var rotation = parseInt(((new Date() - start) / 1000) * lines) / lines;
-    context.save();
-    context.clearRect(0, 0, cW, cH);
-    context.translate(cW / 2, cH / 2);
-    context.rotate(Math.PI * 2 * rotation);
-    for (var i = 0; i < lines; i++) {
-      context.beginPath();
-      context.rotate(Math.PI * 2 / lines);
-      context.moveTo(cW / 10, 0);
-      context.lineTo(cW / 4, 0);
-      context.lineWidth = cW / 30;
-      context.strokeStyle = "rgba(0, 0, 0," + i / lines + ")";
-      context.stroke();
-    }
-    context.restore();
-};
-window.setInterval(draw, 1000 / 40);
-};
-
-// get a forecast!
 function getForecast(lat, lng) {
   var xhr = new XMLHttpRequest();
   xhr.open("GET",`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/${lat},${lng}?exclude=minutely,hourly,daily,alerts,flags`);
@@ -119,12 +85,11 @@ function getForecast(lat, lng) {
 }
 
 function readyLatLng(lat, lng){
-  // kill the loading animation
-  forecastLoader.remove();
+  document.querySelector("#location-form").remove();
 
   var readyDiv = document.createElement("DIV");
-  readyDiv.setAttribute("id", "container");
-  document.body.appendChild(readyDiv);
+  readyDiv.setAttribute("id", "ready-form");
+  locationFormContainer.appendChild(readyDiv);
 
   var readyDivHeader = document.createElement("H1");
   readyDivHeader.textContent = "Location ready.";
@@ -135,46 +100,24 @@ function readyLatLng(lat, lng){
   readyForm.setAttribute("action", "/");
   readyDiv.appendChild(readyForm);
 
-  var readyFormText = document.createElement("input"); //input element, text
+  var readyFormText = document.createElement("INPUT"); //input element, text
   readyFormText.setAttribute('type',"text");
   readyFormText.setAttribute('name',"locationstring");
   readyFormText.setAttribute('size',"30");
   readyFormText.setAttribute('value',`${lat},${lng}`);
   readyForm.appendChild(readyFormText);
 
-  var readyFormButton = document.createElement("input"); //input element, Submit button
+  var readyFormButton = document.createElement("INPUT"); //input element, Submit button
   readyFormButton.setAttribute('type',"submit");
   readyFormButton.setAttribute('value',"Submit");
   readyForm.appendChild(readyFormButton);
 }
-
-// initialize the canvas
-const canvas = document.querySelector("canvas");
-canvas.width = window.innerWidth * 2/3;
-canvas.height = window.innerHeight * 4/5;
-var ctx = canvas.getContext("2d");
-
-// // add some responsiveness to the page
-// window.addEventListener('resize', function() {
-// 	w = canvas.width = window.innerWidth;
-// 	h = canvas.height = window.innerHeight;
-// });
 
 // play a piano sound
 var soundFileNumber = Math.floor(Math.random() * 13) + 1;
 var ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
 ding.volume = 0.2;
 ding.play();
-
-// setTimeout(function() {
-//   //Do something after 5 seconds
-// }, 5000);
-
-// setInterval(function() {
-//   // Do something every 5 seconds
-// }, 5000);
-
-//first draw the particle vortex
 
 // set particle variables
 var w = canvas.width;

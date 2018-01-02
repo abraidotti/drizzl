@@ -246,9 +246,10 @@ Object.keys(forecast.currently).forEach(function(key) {
         ${forecast.currently[`${key}`]}.`;
         ticker.appendChild(tickerItem);
         console.log(`${key} button activated.`);
+
         if (key === 'nearestStormDistance'){
           console.log(`${key}(${forecastModifier}) changes the maximum particle link distance.`);
-          maxUmbilicalDistance += Math.round(forecastModifier);
+          maxUmbilicalDistance += forecastModifier;
         }
         if (key === 'nearestStormBearing'){
           console.log(`${key}(${forecastModifier}) changes particle size.`);
@@ -256,11 +257,11 @@ Object.keys(forecast.currently).forEach(function(key) {
         }
         if (key === 'precipIntensity'){
           console.log(`${key}(${forecastModifier}) changes particle vertical velocity.`);
-          verticalVelocityModifier += 1;
+          verticalVelocityModifier += forecastModifier;
         }
         if (key === 'precipProbability'){
           console.log(`${key}(${forecastModifier}) changes particle outer circle distance.`);
-          outerCircleDistance += Math.round(forecastModifier / 10);
+          outerCircleDistance += forecastModifier * 10;
         }
         if (key === 'dewPoint'){
           console.log(`${key}(${forecastModifier}) changes outer circle line composition.`);
@@ -304,32 +305,24 @@ Object.keys(forecast.currently).forEach(function(key) {
           console.log(`${key}(${forecastModifier}) changes outer circle width.`);
           outerCircleWidth = Math.round(forecastModifier / 100);
         }
-      }
+      };
 
-      // particleSize = 2,
-      // particleSizeVariation = 2,
-      // outerCircleDistance = 2,
-      // maxUmbilicalDistance = 50,
-      // horizontalVelocity = 1.1,
-      // verticalVelocity = 1.1,
-      // velocityModifier = 3,
-
-      // Math.abs(Math.round(3 * forecast.currently.apparentTemperature))
       if (!btn.classList.contains("activated")) {
         console.log(`${key} button deactivated.`);
         let tickerItemToDestroy = document.querySelector(`.${key}`);
         ticker.removeChild(tickerItemToDestroy);
+
         if (key === 'nearestStormDistance'){
-          maxUmbilicalDistance -= Math.round(forecastModifier);
+          maxUmbilicalDistance -= forecastModifier;
         }
         if (key === 'nearestStormBearing'){
           particleSize -= Math.round(forecastModifier / 100);
         }
         if (key === 'precipIntensity'){
-          verticalVelocityModifier -= 1;
+          verticalVelocityModifier -= forecastModifier;;
         }
         if (key === 'precipProbability'){
-          outerCircleDistance -= Math.round(forecastModifier / 10);
+          outerCircleDistance -= forecastModifier * 10;
         }
         if (key === 'dewPoint'){
           outerCircleLineDashLineLength -= Math.round(forecastModifier / 100);
