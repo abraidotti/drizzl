@@ -9,6 +9,12 @@ const canvas = document.querySelector("#forecast-canvas");
 const ticker = document.querySelector("#ticker");
 const ctx = canvas.getContext("2d");
 
+// play a piano sound
+let soundFileNumber = Math.floor(Math.random() * 13) + 1;
+let ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
+ding.volume = 0.1;
+ding.play();
+
 // set variables
 var particles = [],
   particlesNum = (Math.abs(Math.round(forecast.currently.temperature))),

@@ -96,6 +96,7 @@ h3 {
   animation-name: ticker;
   animation-duration: 30s;
 }
+
 .ticker__item {
   display: inline-block;
   padding: 0 2rem;
