@@ -265,7 +265,7 @@ Object.keys(forecast.currently).forEach(function(key) {
           particleSize += Math.round(forecastModifier / 10);
         }
         if (key === 'precipIntensity'){
-          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}mm.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier} mm.`);
           console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies velocity.`);
           velocityModifier += forecastModifier;
         }
@@ -286,17 +286,17 @@ Object.keys(forecast.currently).forEach(function(key) {
           particleTransparencyModifier = forecastModifier;
         }
         if (key === 'pressure'){
-          tickerItem.textContent = (`The ${btnReadableLabel} ${forecastModifier}millibars.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} ${forecastModifier} millibars.`);
           console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle size.`);
           particleSize += Math.round(forecastModifier / 1000);
         }
         if (key === 'windSpeed'){
-          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}mph.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier} mph.`);
           console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies horizontal velocity.`);
           horizontalVelocityModifier += Math.round(forecastModifier);
         }
         if (key === 'windGust'){
-          tickerItem.textContent = (`The ${btnReadableLabel}s are ${forecastModifier}mph.`);
+          tickerItem.textContent = (`The ${btnReadableLabel}s are ${forecastModifier} mph.`);
           console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies horizontal and vertical velocity.`);
           horizontalVelocityModifier += Math.round(forecastModifier / 10);
           verticalVelocityModifier += Math.round(forecastModifier / 10);
@@ -318,12 +318,12 @@ Object.keys(forecast.currently).forEach(function(key) {
           umbilicalWidth = forecastModifier;
         }
         if (key === 'visibility'){
-          tickerItem.textContent = (`The ${btnReadableLabel} at this time is ${forecastModifier} kilometers.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} at this time is ${forecastModifier}  kilometers.`);
           console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle size.`);
           particleSize += forecastModifier;
         }
         if (key === 'ozone'){
-          tickerItem.textContent = (`The ${btnReadableLabel} level is ${forecastModifier}.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} level is ${forecastModifier} Dobsons.`);
           console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies outer circle width.`);
           outerCircleWidth = Math.round(forecastModifier / 10);
         }
