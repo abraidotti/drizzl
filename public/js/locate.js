@@ -20,20 +20,11 @@ const options = {
   maximumAge: 0
 };
 
-// play a piano sound
-let soundFileNumber = Math.floor(Math.random() * 13) + 1;
-let ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
-ding.volume = 0.1;
-ding.play();
+// disable enter key from submitting form
+window.addEventListener('keydown',function(e){if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){if(e.target.nodeName=='INPUT'&&e.target.type=='text'){e.preventDefault();return false;}}},true);
 
 // if user hits "get mine" button:
 navigatorLocateButton.addEventListener('click', function() {
-
-  // play a piano sound
-  soundFileNumber = Math.floor(Math.random() * 13) + 1;
-  ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
-  ding.volume = 0.1;
-  ding.play();
 
   // make a request for the user's geolocation
   navigator.geolocation.getCurrentPosition(success, error, options);
@@ -64,12 +55,6 @@ navigatorLocateButton.addEventListener('click', function() {
 locationButton.addEventListener("click", function(event) {
   // prevent page reload on form submission
   event.preventDefault();
-
-  // play a piano sound
-  soundFileNumber = Math.floor(Math.random() * 13) + 1;
-  ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
-  ding.volume = 0.1;
-  ding.play();
 
   // geocode the user's location
   var geocoder = new google.maps.Geocoder();
@@ -142,8 +127,8 @@ function readyLatLng(lat, lng) {
   readyForm.appendChild(readyFormButton);
 
   // play a piano sound
-  soundFileNumber = Math.floor(Math.random() * 13) + 1;
-  ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
+  let soundFileNumber = Math.floor(Math.random() * 13) + 1;
+  let ding = new Audio(`.public/audio/${soundFileNumber}.mp3`);
   ding.volume = 0.1;
   ding.play();
 }

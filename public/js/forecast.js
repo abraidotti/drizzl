@@ -6,25 +6,35 @@ console.log(forecast);
 // render components
 const controlPanel = document.querySelector("#control-panel");
 const canvas = document.querySelector("#forecast-canvas");
+const tickerWrap = document.querySelector("#ticker-wrap");
 const ticker = document.querySelector("#ticker");
 const ctx = canvas.getContext("2d");
 
-// play a piano sound
-let soundFileNumber = Math.floor(Math.random() * 13) + 1;
-let ding = new Audio(`.public/audio/extra-${soundFileNumber}.mp3`);
-ding.volume = 0.1;
-ding.play();
+controlPanel.style.backgroundColor = `hsl(${Math.abs(Math.round(3 * forecast.currently.temperature))}, 10%, 10%)`;
+tickerWrap.style.backgroundColor = `hsl(${Math.abs(Math.round(3 * forecast.currently.temperature) + 180)}, 10%, 10%)`;
+
+// load the temperature (F) and forecast summary into the ticker
+  let tickerGreeting = document.createElement("DIV");
+  tickerGreeting.setAttribute("class", "ticker__item");
+  // render a forecast greeting
+  tickerGreeting.innerHTML = `The forecast is ${Math.round(
+    forecast.currently.apparentTemperature
+  )}°F
+    and ${forecast.currently.summary.toLowerCase()}.`;
+  ticker.appendChild(tickerGreeting);
+
+// set the mood
+const colors = [
+  `hsl(${Math.abs(Math.round(3 * forecast.currently.temperature))}, 60%, 60%)`,
+  `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 180 ))}, 60%, 60%)`,
+  `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 240 ))}, 60%, 60%)`
+];
 
 // set variables
 var particles = [],
   particlesNum = (Math.abs(Math.round(forecast.currently.temperature))),
   w = 4 * document.documentElement.clientWidth / 5,
   h = 4 * document.documentElement.clientHeight / 5,
-  colors = [
-    `hsl(${Math.abs(Math.round(3 * forecast.currently.temperature))}, 60%, 60%)`,
-    `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 180 ))}, 60%, 60%)`,
-    `hsl(${Math.abs(Math.round((3 * forecast.currently.temperature) + 240 ))}, 60%, 60%)`
-  ],
   particleSize = 2,
   particleSizeVariation = 2,
   outerCircleDistance = 2,
@@ -36,11 +46,11 @@ var particles = [],
   umbilicalLineDashLineLength = 0,
   umbilicalLineDashGapLength = 0,
   maxUmbilicalDistance = 50,
-  horizontalVelocity = (Math.round(forecast.currently.windSpeed / 10)),
-  verticalVelocity = (Math.round(forecast.currently.windGust / 10)),
-  velocityModifier = (Math.round(forecast.currently.windBearing / 60)),
-  horizontalVelocityModifier = 0,
-  verticalVelocityModifier = 0,
+  horizontalVelocity = Math.round(forecast.latitude / 10),
+  verticalVelocity = Math.round(forecast.longitude / 10),
+  velocityModifier = 0,
+  horizontalVelocityModifier = 1,
+  verticalVelocityModifier = 1,
   gco = [
     "source-over",
     "source-in",
@@ -70,7 +80,7 @@ var particles = [],
     "luminosity"
   ],
   gcoText = [
-    "This is the default setting and draws new shapes on top of the existing canvas content.",
+    "This is the default composition setting and draws new shapes on top of the existing canvas content.",
     "The new shape is drawn only where both the new shape and the destination canvas overlap. Everything else is made transparent.",
     "The new shape is drawn where it doesn't overlap the existing canvas content.",
     "The new shape is only drawn where it overlaps the existing canvas content.",
@@ -115,8 +125,8 @@ function Particle() {
   // get color
   this.color = colors[Math.round(Math.random() * (colors.length - 1))];
   // get velocity
-  this.vx = Math.round(Math.random() * velocityModifier) - horizontalVelocity;
-  this.vy = Math.round(Math.random() * velocityModifier) - verticalVelocity;
+  this.vx = Math.random() * horizontalVelocity + velocityModifier;
+  this.vy = Math.random() * verticalVelocity + velocityModifier;
 }
 
 function draw() {
@@ -176,26 +186,14 @@ function draw() {
     ctx.closePath();
 
     // render movement at constant velocity
-    temp.x += temp.vx + horizontalVelocityModifier;
-    temp.y += temp.vy + verticalVelocityModifier;
+    temp.x += temp.vx + velocityModifier + horizontalVelocityModifier;
+    temp.y += temp.vy + velocityModifier + verticalVelocityModifier;
 
     // wrap particles on canvas
     if (temp.x > w) temp.x = 0;
     if (temp.x < 0) temp.x = w;
     if (temp.y > h) temp.y = 0;
     if (temp.y < 0) temp.y = h;
-  }
-
-  // load the temperature (F) and forecast summary into the ticker
-  if (ticker.childElementCount === 0) {
-    let tickerGreeting = document.createElement("DIV");
-    tickerGreeting.setAttribute("class", "ticker__item");
-    // render a forecast greeting
-    tickerGreeting.innerHTML = `${Math.round(
-      forecast.currently.apparentTemperature
-    )}°F
-      and ${forecast.currently.summary.toLowerCase()}`;
-    ticker.appendChild(tickerGreeting);
   }
 }
 
@@ -225,7 +223,7 @@ window.requestAnimFrame = (function() {
 
 // iterate through each forecast key
 Object.keys(forecast.currently).forEach(function(key) {
-  // if the key's value is numerical
+  // exclude ambiguous, unnecessary, and non-numerical keys
   if (key != "time" && key != "icon" && key != "summary" && key != "temperature" && key != "apparentTemperature") {
     // make a control panel button
     let btn = document.createElement("BUTTON");
@@ -240,77 +238,96 @@ Object.keys(forecast.currently).forEach(function(key) {
 
     // listen for button clicks
     btn.addEventListener("click", function(event) {
+      // play a piano sound
+      let soundFileNumber = Math.floor(Math.random() * 13) + 1;
+      let ding = new Audio(`.public/audio/${soundFileNumber}.mp3`);
+      ding.volume = 0.1;
+      ding.play();
+
       forecastModifier = forecast.currently[`${key}`];
 
       btn.classList.toggle("activated");
 
       // if the key's value is a number, store its integer
       if (btn.classList.contains("activated")) {
+        console.log(`${key} button activated.`);
         let tickerItem = document.createElement("DIV");
         tickerItem.setAttribute("class", `ticker__item ${key}`);
-        tickerItem.textContent = `The ${btnReadableLabel} is
-        ${forecast.currently[`${key}`]}.`;
-        ticker.appendChild(tickerItem);
-        console.log(`${key} button activated.`);
 
         if (key === 'nearestStormDistance'){
-          console.log(`${key}(${forecastModifier}) changes the maximum particle link distance.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier} miles.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies max umbilical distance.`);
           maxUmbilicalDistance += forecastModifier;
         }
         if (key === 'nearestStormBearing'){
-          console.log(`${key}(${forecastModifier}) changes particle size.`);
-          particleSize += Math.round(forecastModifier / 100);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}°.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle size.`);
+          particleSize += Math.round(forecastModifier / 10);
         }
         if (key === 'precipIntensity'){
-          console.log(`${key}(${forecastModifier}) changes particle vertical velocity.`);
-          verticalVelocityModifier += forecastModifier;
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}mm.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies velocity.`);
+          velocityModifier += forecastModifier;
         }
         if (key === 'precipProbability'){
-          console.log(`${key}(${forecastModifier}) changes particle outer circle distance.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier * 100}%.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies outer circle distance.`);
           outerCircleDistance += forecastModifier * 10;
         }
         if (key === 'dewPoint'){
-          console.log(`${key}(${forecastModifier}) changes outer circle line composition.`);
-          outerCircleLineDashLineLength += Math.round(forecastModifier / 100);
-          outerCircleLineDashGapLength += Math.round(forecastModifier / 100);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}°F.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies out circle line composition.`);
+          outerCircleLineDashLineLength += Math.round(forecastModifier);
+          outerCircleLineDashGapLength += Math.round(forecastModifier);
         }
         if (key === 'humidity'){
-          console.log(`${key}(${forecastModifier}) changes particle transparency.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} (${forecastModifier * 100}%.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle transparency.`);
           particleTransparencyModifier = forecastModifier;
         }
         if (key === 'pressure'){
-          console.log(`${key}(${forecastModifier}) changes particle size.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} ${forecastModifier}millibars.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle size.`);
           particleSize += Math.round(forecastModifier / 1000);
         }
         if (key === 'windSpeed'){
-          console.log(`${key}(${forecastModifier}) changes particle horizontal velocity.`);
-          horizontalVelocityModifier += Math.round(forecastModifier / 10);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}mph.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies horizontal velocity.`);
+          horizontalVelocityModifier += Math.round(forecastModifier);
         }
         if (key === 'windGust'){
-          console.log(`${key}(${forecastModifier}) changes particle horizontal velocity.`);
+          tickerItem.textContent = (`The ${btnReadableLabel}s are ${forecastModifier}mph.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies horizontal and vertical velocity.`);
           horizontalVelocityModifier += Math.round(forecastModifier / 10);
+          verticalVelocityModifier += Math.round(forecastModifier / 10);
         }
         if (key === 'windBearing'){
-          console.log(`${key}(${forecastModifier}) changes particle vertical velocity.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}°.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies vertical velocity.`);
           verticalVelocityModifier += Math.round(forecastModifier / 100);
         }
         if (key === 'cloudCover'){
-          console.log(`${key}(${forecastModifier}) changes particle link line composition.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} measurement is ${forecastModifier}.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle link line composition.`);
           umbilicalLineDashLineLength += Math.round(forecastModifier);
           umbilicalLineDashGapLength += Math.round(forecastModifier);
         }
         if (key === 'uvIndex'){
-          console.log(`${key}(${forecastModifier}) changes particle link width.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} is ${forecastModifier}.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle link line width.`);
           umbilicalWidth = forecastModifier;
         }
         if (key === 'visibility'){
-          console.log(`${key}(${forecastModifier}) changes particle size.`);
+          tickerItem.textContent = (`The ${btnReadableLabel} at this time is ${forecastModifier} kilometers.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies particle size.`);
           particleSize += forecastModifier;
         }
         if (key === 'ozone'){
-          console.log(`${key}(${forecastModifier}) changes outer circle width.`);
-          outerCircleWidth = Math.round(forecastModifier / 100);
+          tickerItem.textContent = (`The ${btnReadableLabel} level is ${forecastModifier}.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies outer circle width.`);
+          outerCircleWidth = Math.round(forecastModifier / 10);
         }
+        ticker.appendChild(tickerItem);
       };
 
       if (!btn.classList.contains("activated")) {
@@ -322,17 +339,17 @@ Object.keys(forecast.currently).forEach(function(key) {
           maxUmbilicalDistance -= forecastModifier;
         }
         if (key === 'nearestStormBearing'){
-          particleSize -= Math.round(forecastModifier / 100);
+          particleSize -= Math.round(forecastModifier / 10);
         }
         if (key === 'precipIntensity'){
-          verticalVelocityModifier -= forecastModifier;;
+          velocityModifier -= forecastModifier;;
         }
         if (key === 'precipProbability'){
           outerCircleDistance -= forecastModifier * 10;
         }
         if (key === 'dewPoint'){
-          outerCircleLineDashLineLength -= Math.round(forecastModifier / 100);
-          outerCircleLineDashGapLength -= Math.round(forecastModifier / 100);
+          outerCircleLineDashLineLength -= Math.round(forecastModifier);
+          outerCircleLineDashGapLength -= Math.round(forecastModifier);
         }
         if (key === 'humidity'){
           particleTransparencyModifier = 1;
@@ -341,7 +358,7 @@ Object.keys(forecast.currently).forEach(function(key) {
           particleSize -= Math.round(forecastModifier / 1000);
         }
         if (key === 'windSpeed'){
-          horizontalVelocityModifier -= Math.round(forecastModifier / 10);
+          horizontalVelocityModifier -= Math.round(forecastModifier);
         }
         if (key === 'windGust'){
           horizontalVelocityModifier -= Math.round(forecastModifier / 10);
@@ -353,7 +370,6 @@ Object.keys(forecast.currently).forEach(function(key) {
           umbilicalLineDashLineLength -= Math.round(forecastModifier);
           umbilicalLineDashGapLength -= Math.round(forecastModifier);
         }
-
         if (key === 'uvIndex'){
           umbilicalWidth = 0;
         }

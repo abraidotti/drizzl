@@ -48,13 +48,12 @@ h3 {
   grid-row: 1;
   padding: 0;
   border-radius: 2vw;
-  box-shadow: inset 0 0 3vw hsl(20,60%,10%);
 }
 
 #control-panel {
   grid-column: 2 / 2;
   grid-row: 1;
-  background-color: hsl(40,60%,10%);
+  background-color: hsl(240,0%,0%);
   display: block;
   overflow-y: auto;
 }
@@ -65,7 +64,7 @@ h3 {
   height: 6vh;
   margin: 0 auto;
   padding: 0;
-  background-color: hsl(180,60%,10%);
+  background-color: hsl(10,20%,10%);
   border-radius: 1vw;
   border: 0.1vw solid hsl(300,60%,10%);
   color: #fefbef;
@@ -74,11 +73,15 @@ h3 {
 }
 
 #control-panel button:hover {
-  background-color: hsl(10,60%,10%);
+  background-color: hsl(10,60%,60%);
+}
+
+#control-panel button:focus {
+  outline: none;
 }
 
 #control-panel button.activated {
-  background-color: hsl(100,60%,60%);
+  background-color: hsl(190,60%,60%);
 }
 
 #ticker-wrap {
@@ -88,7 +91,7 @@ h3 {
   height: auto;
   overflow: hidden;
   height: 4rem;
-  background-color: hsl(120,60%,60%);
+  background-color: hsl(120,10%,10%);
   padding-left: 100%;
 }
 
