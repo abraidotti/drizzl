@@ -224,7 +224,7 @@ window.requestAnimFrame = (function() {
 // iterate through each forecast key
 Object.keys(forecast.currently).forEach(function(key) {
   // exclude ambiguous, unnecessary, and non-numerical keys
-  if (key != "time" && key != "icon" && key != "summary" && key != "temperature" && key != "apparentTemperature") {
+  if (key != "time" && key != "icon" && key != "summary" && key != "temperature" && key != "apparentTemperature" && key != "precipIntensityError") {
     // make a control panel button
     let btn = document.createElement("BUTTON");
     btn.setAttribute("id", `btn-${key}`);
@@ -326,6 +326,10 @@ Object.keys(forecast.currently).forEach(function(key) {
           tickerItem.textContent = (`The ${btnReadableLabel} level is ${forecastModifier} Dobsons.`);
           console.log(`${btnReadableLabel} (${forecastModifier}) activated. Modifies outer circle width.`);
           outerCircleWidth = Math.round(forecastModifier / 10);
+        }
+        else {
+          tickerItem.textContent = (`The ${btnReadableLabel} level is ${forecastModifier}.`);
+          console.log(`${btnReadableLabel} (${forecastModifier}) activated. No prescribed value.`);
         }
         ticker.appendChild(tickerItem);
       };
