@@ -1,6 +1,7 @@
 // grab the forecast object in the hackiest way possible ;)
 const forecast = JSON.parse(document.querySelector("H3").textContent);
 document.querySelector("H3").remove();
+console.log("Source code available at https://github.com/abraidotti/drizzl. Stay DRY :)")
 console.log(forecast);
 
 // render components

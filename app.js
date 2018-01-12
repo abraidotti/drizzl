@@ -1,5 +1,4 @@
 var express = require('express');
-var sassMiddleware = require('node-sass-middleware');
 var bodyParser = require('body-parser');
 var https = require("https");
 var request = require('request');
@@ -15,15 +14,6 @@ var path = require('path');
 // var Forecast = mongoose.model('Forecast', myForecast);
 
 var app = express();
-
-// adding the sass middleware
-app.use(
-  sassMiddleware({
-    src: __dirname + '/public/sass',
-    dest: __dirname + '/public/css',
-    debug: true,
-  })
-);
 
 app.use(bodyParser.urlencoded({extended : true}));
 app.use('*/css',express.static('public/css'));
@@ -46,10 +36,6 @@ app.post('/', function(req, res){
   res.render('forecast', { body });
   });
 });
-
-app.get('/bye', function(req, res){
-  res.render('bye');
-})
 
 const PORT = process.env.PORT || 3000;
 
