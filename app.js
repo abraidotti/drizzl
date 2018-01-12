@@ -26,7 +26,8 @@ app.get('/', function(req, res){
 })
 
 app.post('/', function(req, res){
-  request(`https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/${req.body.locationstring}?exclude=minutely,hourly,daily,alerts,flags`, function (error, response, body) {
+  request(`https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/
+    ${req.body.locationstring}?exclude=minutely,hourly,daily,alerts,flags`, function (error, response, body) {
   // Print the error if one occurred
   console.log('error:', error);
   // Print the response status code if a response was received
