@@ -81,25 +81,6 @@ locationButton.addEventListener("click", function(event) {
   }); // end of geocode block
 }); // end of click function
 
-function getForecast(lat, lng) {
-  var xhr = new XMLHttpRequest();
-  // set env variables in heroku
-  // var DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
-  xhr.open("GET", `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${lat},${lng}?exclude=minutely,hourly,daily,alerts,flags`);
-  console.log("OPENED", xhr.status);
-
-  xhr.onload = function() {
-    console.log("LOADING", xhr.status);
-    if (xhr.status === 200) {
-      forecast = JSON.parse(xhr.responseText);
-      console.log(forecast);
-    } else {
-      alert("Request failed.  Returned status of " + xhr.status);
-    }
-  };
-  xhr.send();
-}
-
 function readyLatLng(lat, lng) {
   locationForm.remove();
 
