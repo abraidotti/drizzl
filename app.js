@@ -3,15 +3,7 @@ var bodyParser = require('body-parser');
 var https = require("https");
 var request = require('request');
 var path = require('path');
-
-// var mongoose = require('mongoose');
-// var Schema = mongoose.Schema;
-//
-// mongoose.connect('mongodb://drizzl:drizzltest@ds161146.mlab.com:61146/forecasts');
-// mongoose.Promise = global.Promise;
-// var db = mongoose.connection;
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-// var Forecast = mongoose.model('Forecast', myForecast);
+require('dotenv').config();
 
 var app = express();
 
