@@ -83,7 +83,8 @@ locationButton.addEventListener("click", function(event) {
 
 function getForecast(lat, lng) {
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/8c3c8dc972b787fa631b37e0cf3da0d2/${lat},${lng}?exclude=minutely,hourly,daily,alerts,flags`);
+  var DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
+  xhr.open("GET", `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${lat},${lng}?exclude=minutely,hourly,daily,alerts,flags`);
   console.log("OPENED", xhr.status);
 
   xhr.onload = function() {
