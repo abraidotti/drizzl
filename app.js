@@ -20,7 +20,7 @@ app.get('/', function(req, res){
 app.post('/', function(req, res){
   // for Heroku
   // var DARKSKY_API_KEY = process.env.DARKSKY_API_KEY;
-  request(`https://api.darksky.net/forecast/${DARKSKY_API_KEY}/${req.body.locationstring}?exclude=minutely,hourly,daily,alerts,flags`, function (error, response, body) {
+  request(`https://api.darksky.net/forecast/31fb2ee86b507e825d194fe061876f43/${req.body.locationstring}?exclude=minutely,hourly,daily,alerts,flags`, function (error, response, body) {
   // Print the error if one occurred
   console.log('error:', error);
   // Print the response status code if a response was received
